@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Advanced Excel - Master Your Career</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#f0f1f2",
+                        "secondary-container": "#cfe6f2",
+                        "background": "#f8f9fa",
+                        "tertiary": "#80343e",
+                        "on-tertiary-fixed-variant": "#782e38",
+                        "on-tertiary-fixed": "#3f0210",
+                        "surface-tint": "#176c40",
+                        "on-secondary-container": "#526772",
+                        "tertiary-fixed": "#ffdadb",
+                        "tertiary-container": "#9e4b55",
+                        "primary-fixed-dim": "#88d8a1",
+                        "outline": "#6f7a70",
+                        "on-secondary-fixed": "#071e27",
+                        "on-error-container": "#93000a",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#bfc9be",
+                        "surface-container-high": "#e7e8e9",
+                        "on-surface": "#191c1d",
+                        "primary-container": "#217346",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed-dim": "#ffb2b8",
+                        "secondary-fixed": "#cfe6f2",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f3f4f5",
+                        "primary-fixed": "#a3f4bc",
+                        "inverse-primary": "#88d8a1",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#354a53",
+                        "primary": "#005931",
+                        "on-primary-fixed": "#00210f",
+                        "surface-variant": "#e1e3e4",
+                        "secondary-fixed-dim": "#b4cad6",
+                        "secondary": "#4c616c",
+                        "on-background": "#191c1d",
+                        "surface-bright": "#f8f9fa",
+                        "surface-container": "#edeeef",
+                        "on-primary-container": "#a4f5bd",
+                        "surface": "#f8f9fa",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-container": "#ffdadc",
+                        "on-primary-fixed-variant": "#00522d",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#3f4941",
+                        "inverse-surface": "#2e3132",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#d9dadb",
+                        "surface-container-highest": "#e1e3e4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .cell-grid-bg {
+            background-image: linear-gradient(to right, rgba(191, 201, 190, 0.08) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(191, 201, 190, 0.08) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Admin Login Modal */
+        .admin-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .admin-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .admin-login-box {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2.5rem 2rem;
+            width: 90%;
+            max-width: 380px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            transform: translateY(30px) scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .admin-overlay.active .admin-login-box {
+            transform: translateY(0) scale(1);
+        }
+
+        /* Editable highlight */
+        [data-editable].admin-editable {
+            outline: 2px dashed rgba(33,115,70,0.5);
+            outline-offset: 4px;
+            cursor: text;
+            position: relative;
+            transition: outline-color 0.2s;
+            border-radius: 4px;
+        }
+        [data-editable].admin-editable:hover {
+            outline-color: rgba(33,115,70,0.9);
+            background: rgba(33,115,70,0.04);
+        }
+        [data-editable].admin-editable:focus {
+            outline: 2px solid #217346;
+            background: rgba(33,115,70,0.06);
+        }
+
+        /* Admin toolbar */
+        .admin-toolbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9998;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transform: translateY(-100%);
+            transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+        }
+        .admin-toolbar.active {
+            transform: translateY(0);
+        }
+        .admin-toolbar button {
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        .admin-toolbar .btn-save {
+            background: #217346;
+            color: white;
+        }
+        .admin-toolbar .btn-save:hover {
+            background: #19a35a;
+        }
+        .admin-toolbar .btn-logout {
+            background: rgba(255,255,255,0.12);
+            color: white;
+        }
+        .admin-toolbar .btn-logout:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .admin-toolbar .btn-reset {
+            background: rgba(186,26,26,0.15);
+            color: #ff6b6b;
+        }
+        .admin-toolbar .btn-reset:hover {
+            background: rgba(186,26,26,0.3);
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #1a1a2e;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 99999;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast.success { border-left: 4px solid #217346; }
+        .toast.error { border-left: 4px solid #ba1a1a; }
+        .toast.info { border-left: 4px solid #3b82f6; }
+
+        /* Hidden trigger area - bottom-left corner, invisible */
+        .admin-trigger {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 30px;
+            height: 30px;
+            z-index: 100;
+            cursor: default;
+            opacity: 0;
+        }
+
+        /* Shake animation for wrong password */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+        }
+        .shake { animation: shake 0.4s ease; }
+
+        /* Image edit overlay */
+        .img-edit-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+            cursor: pointer;
+            border-radius: inherit;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .admin-mode [data-img] {
+            position: relative;
+            cursor: pointer;
+        }
+        .admin-mode [data-img]::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border: 2px dashed rgba(33,115,70,0.6);
+            border-radius: inherit;
+            pointer-events: none;
+            transition: all 0.2s;
+            z-index: 5;
+        }
+        .admin-mode [data-img]:hover::after {
+            border-color: rgba(33,115,70,1);
+            background: rgba(33,115,70,0.08);
+        }
+        /* Image edit badge */
+        .img-edit-badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 24px;
+            height: 24px;
+            background: #217346;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            opacity: 0;
+            transform: scale(0.7);
+            transition: all 0.2s;
+            pointer-events: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+        .img-edit-badge .material-symbols-outlined {
+            font-size: 14px;
+            color: white;
+        }
+        .admin-mode [data-img]:hover .img-edit-badge,
+        .admin-mode .img-edit-badge-container:hover .img-edit-badge {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+        /* In admin mode, make overlays above images non-blocking */
+        .admin-mode .admin-click-through {
+            pointer-events: none !important;
+        }
+        /* URL input modal for images */
+        .img-url-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .img-url-modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .img-url-box {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+        .img-url-modal.active .img-url-box {
+            transform: translateY(0);
+        }
+        .img-preview {
+            width: 100%;
+            height: 120px;
+            border-radius: 12px;
+            object-fit: cover;
+            background: #f3f4f5;
+            border: 1px solid #e1e3e4;
+            margin-bottom: 12px;
+        }
+
+        /* CTA Popup */
+        .cta-popup-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(6px);
+            z-index: 9990;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .cta-popup-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .cta-popup-box {
+            background: white;
+            border-radius: 1.75rem 1.75rem 0 0;
+            padding: 2rem 1.5rem 2.5rem;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
+        }
+        .cta-popup-overlay.active .cta-popup-box {
+            transform: translateY(0);
+        }
+        .cta-popup-handle {
+            width: 40px; height: 4px;
+            background: #d9dadb;
+            border-radius: 4px;
+            margin: 0 auto 20px;
+        }
+        /* Star rating */
+        .star-rating { display: flex; gap: 6px; justify-content: center; }
+        .star-rating .star-btn {
+            background: none; border: none; cursor: pointer; padding: 4px;
+            transition: transform 0.15s;
+        }
+        .star-rating .star-btn:hover { transform: scale(1.2); }
+        .star-rating .star-btn .material-symbols-outlined {
+            font-size: 36px;
+            color: #d9dadb;
+            transition: color 0.2s;
+        }
+        .star-rating .star-btn.active .material-symbols-outlined {
+            color: #f59e0b;
+            font-variation-settings: 'FILL' 1;
+        }
+        /* Zalo button */
+        .zalo-btn {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; padding: 14px; border-radius: 14px;
+            background: #0068ff; color: white;
+            font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 16px;
+            border: none; cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0,104,255,0.3);
+            transition: all 0.2s;
+        }
+        .zalo-btn:hover { background: #0055d4; }
+        .zalo-btn:active { transform: scale(0.97); }
+        /* Instructor contact card */
+        .instructor-contact-card {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px; border-radius: 16px;
+            background: #f3f4f5; border: 1px solid #e1e3e4;
+        }
+        .instructor-contact-avatar {
+            width: 56px; height: 56px;
+            border-radius: 14px; object-fit: cover;
+            background: #e1e3e4; flex-shrink: 0;
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Student Results Gallery */
+        .gallery-track {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding: 4px 0 16px 0;
+        }
+        .gallery-track::-webkit-scrollbar { display: none; }
+        .gallery-item {
+            flex: 0 0 280px;
+            scroll-snap-align: start;
+            border-radius: 1rem;
+            overflow: hidden;
+            background: white;
+            border: 1px solid rgba(191,201,190,0.15);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            transition: transform 0.2s;
+        }
+        .gallery-item:active { transform: scale(0.98); }
+        .gallery-item-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+            background: #e7e8e9;
+        }
+        .gallery-item-body { padding: 12px 14px; }
+        .gallery-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .gallery-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #bfc9be;
+            transition: all 0.3s;
+        }
+        .gallery-dot.active {
+            background: #217346;
+            width: 22px;
+            border-radius: 4px;
+        }
+        /* Admin: add gallery item button */
+        .gallery-add-btn {
+            flex: 0 0 280px;
+            scroll-snap-align: start;
+            border-radius: 1rem;
+            border: 2px dashed rgba(33,115,70,0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 8px;
+            cursor: pointer;
+            background: rgba(33,115,70,0.03);
+            min-height: 240px;
+            transition: all 0.2s;
+        }
+        .gallery-add-btn:hover {
+            border-color: rgba(33,115,70,0.8);
+            background: rgba(33,115,70,0.06);
+        }
+        .admin-mode .gallery-add-btn { display: flex; }
+        /* Admin: delete button on gallery items */
+        .gallery-delete-btn {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 28px; height: 28px;
+            background: rgba(186,26,26,0.85);
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 20;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            border: none;
+            transition: transform 0.15s;
+        }
+        .gallery-delete-btn:hover { transform: scale(1.15); }
+        .gallery-delete-btn .material-symbols-outlined { font-size: 16px; color: white; }
+        .admin-mode .gallery-delete-btn { display: flex; }
+    </style>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface antialiased">
+
+<!-- Hidden Admin Trigger - Triple click bottom-left corner -->
+<div class="admin-trigger" id="adminTrigger" title=""></div>
+
+<!-- Admin Login Modal -->
+<div class="admin-overlay" id="adminOverlay">
+    <div class="admin-login-box" id="adminLoginBox">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-emerald-900 rounded-xl flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-xl">admin_panel_settings</span>
+            </div>
+            <div>
+                <h3 class="font-headline font-extrabold text-lg text-on-surface">Quản trị viên</h3>
+                <p class="text-xs text-secondary">Đăng nhập để chỉnh sửa nội dung</p>
+            </div>
+        </div>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-secondary mb-1.5 uppercase tracking-wider">Tài khoản</label>
+                <input type="text" id="adminUser" placeholder="Nhập tài khoản"
+                    class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-medium text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                    autocomplete="off" />
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-secondary mb-1.5 uppercase tracking-wider">Mật khẩu</label>
+                <div class="relative">
+                    <input type="password" id="adminPass" placeholder="Nhập mật khẩu"
+                        class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-medium text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all pr-12"
+                        autocomplete="off" />
+                    <button type="button" id="togglePassBtn" class="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-on-surface transition-colors">
+                        <span class="material-symbols-outlined text-xl" id="togglePassIcon">visibility_off</span>
+                    </button>
+                </div>
+            </div>
+            <div id="loginError" class="text-xs text-error font-semibold hidden">Sai tài khoản hoặc mật khẩu!</div>
+            <button id="adminLoginBtn"
+                class="w-full py-3.5 bg-emerald-900 text-white rounded-xl font-headline font-bold text-sm shadow-lg hover:bg-emerald-800 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-lg">login</span>
+                Đăng nhập
+            </button>
+            <button id="adminCloseBtn"
+                class="w-full py-2.5 text-secondary text-sm font-medium hover:text-on-surface transition-colors">
+                Hủy
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Toolbar (shown when logged in) -->
+<div class="admin-toolbar" id="adminToolbar">
+    <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-emerald-400 text-lg">edit</span>
+        <span class="font-semibold">Chế độ chỉnh sửa</span>
+        <span class="text-white/40">|</span>
+        <span class="text-white/60 text-xs">Nhấp vào nội dung để sửa</span>
+    </div>
+    <div class="flex items-center gap-2">
+        <button class="btn-save" id="btnSave" onclick="saveContent()">
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">save</span> Lưu</span>
+        </button>
+        <button class="btn-reset" id="btnReset" onclick="resetContent()">
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">restart_alt</span> Mặc định</span>
+        </button>
+        <button class="btn-logout" id="btnLogout" onclick="logoutAdmin()">
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">logout</span> Thoát</span>
+        </button>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Hidden file input for image upload -->
+<input type="file" id="imgFileInput" accept="image/*" style="display:none" />
+
+<!-- Image Edit Modal -->
+<div class="img-url-modal" id="imgEditModal">
+    <div class="img-url-box">
+        <div class="flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 bg-emerald-900 rounded-lg flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-base">image</span>
+            </div>
+            <h3 class="font-headline font-bold text-base text-on-surface">Thay đổi hình ảnh</h3>
+        </div>
+        <img id="imgPreview" class="img-preview" src="" alt="Preview"/>
+        <div class="space-y-3">
+            <div>
+                <label class="block text-[11px] font-bold text-secondary mb-1 uppercase tracking-wider">Dán link ảnh (URL)</label>
+                <input type="text" id="imgUrlInput" placeholder="https://example.com/image.jpg"
+                    class="w-full px-3 py-2.5 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-medium text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
+            </div>
+            <div class="text-center text-xs text-secondary font-semibold">hoặc</div>
+            <button id="imgUploadBtn" class="w-full py-2.5 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-semibold text-secondary hover:bg-surface-container-high transition-colors flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-base">upload</span>
+                Tải ảnh từ máy
+            </button>
+            <div class="flex gap-2 mt-2">
+                <button id="imgSaveBtn" class="flex-1 py-2.5 bg-emerald-900 text-white rounded-xl font-bold text-sm hover:bg-emerald-800 transition-colors flex items-center justify-center gap-1">
+                    <span class="material-symbols-outlined text-base">check</span>
+                    Áp dụng
+                </button>
+                <button id="imgCancelBtn" class="flex-1 py-2.5 bg-surface-container-low text-secondary rounded-xl font-semibold text-sm hover:bg-surface-container-high transition-colors">
+                    Hủy
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-emerald-900/80 backdrop-blur-md flex justify-between items-center px-4 py-3" id="mainHeader">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-white">menu</span>
+<span class="text-lg font-extrabold tracking-tighter text-white font-headline" data-editable="site-title">Advanced Excel</span>
+</div>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-emerald-500/30">
+<img alt="Instructor" class="w-full h-full object-cover" data-img="header-avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGcsNcgMoBrWb6Me-HsWdHxeKceqnNo-Gdkv3w8mN8C6LjdhDIm-s-n6RB0g57RTySp3Xho4IwjuVZ5UqmlJJLKHglDNaWFIS4zkMcfHBdwPiso6kbhLGal8ZOckQczRBvGWwF7KR3FG2H7pgKMNa3CTDjOttCxG81Ud8cgKjLNxixKZVu_FcMkfCV772mO0CtlJ1-INrvXlygzIQPafwl3oisK2qDOraDSVnjw_mVLACbK2wbCOceY48sFkcFqhQuhtsYM_ZNkN6d"/>
+</div>
+</header>
+<main class="pt-16 pb-24 cell-grid-bg min-h-screen">
+<!-- Hero Section -->
+<section class="px-6 pt-12 pb-8 overflow-hidden relative">
+<div class="relative z-10">
+<span class="inline-block px-3 py-1 mb-4 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-headline text-xs font-bold tracking-widest uppercase" data-editable="hero-tag">Precision Learning</span>
+<h1 class="font-headline font-extrabold text-4xl leading-tight tracking-tight text-on-surface mb-4">
+                    <span data-editable="hero-title-1">Làm chủ Excel -</span> <br/>
+<span class="bg-gradient-to-r from-primary to-primary-container bg-clip-text text-transparent italic" data-editable="hero-title-2">Đột phá công việc</span>
+</h1>
+<p class="text-secondary font-medium leading-relaxed max-w-[85%] mb-8" data-editable="hero-desc">
+                    Nâng tầm kỹ năng phân tích dữ liệu với excel, tự tin và thành công hơn trong công việc.
+                </p>
+<div class="flex flex-col gap-3">
+<button class="cta-trigger w-full py-4 bg-primary-container text-white rounded-xl font-headline font-bold text-lg shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+                        <span data-editable="hero-cta">Đăng ký ngay</span>
+                        <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<div class="flex items-center gap-4 py-2 px-1">
+<div class="flex -space-x-3">
+<img alt="User 1" class="w-8 h-8 rounded-full border-2 border-white object-cover" data-img="user1-avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCC4yVSxAK4Pibst_8QrbQTFEnmVGx1TbIE8RQcgB-2Q7lrYEjMofTThRhrDU4AJ1_VSxEZFRMqafITSA1G4ytYLbqYjPgxLxen-wJdPby5jd_fyYUP_EIRlkLfmBMwAm_4n7zDg0cjhR7XOvZqcAw6rYDZU5m2IrKMBUcn-oo3NPGu7xD7u2mPM4rYpzuhyP_Y-5Ay8LmrPMsDWjaLnsFeHO9OViuODWvV-aJjPo1dwxFzW66lHO-usm_sbDvhwMB9gZc5FYLimwu8"/>
+<img alt="User 2" class="w-8 h-8 rounded-full border-2 border-white object-cover" data-img="user2-avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZnLftPCOrie3O9KMgGqFBZmxU7Y7xSgTbCOSLayYFz4lrIC33lpOQDD-ApwKi4ZK3hkP9WVYA8NPzCMer7Io6mIZ3JhzEgYuJ7a_SnFn5QTso7LCr3X6z7U1SqIZi18Nm-NpwEwaPjvGGBubqVlZLqaCQqXymymELqsGw38JYTVfnhz_Z9f_CN7CXOf5pNCKgTNAw77sYGWQ9gg1JQC5j_as6pcuC3ptT6hGMxgaSbdQE1BPfILk6ZeKiMOUyrADsMFyfwE7dGXtT"/>
+<img alt="User 3" class="w-8 h-8 rounded-full border-2 border-white object-cover" data-img="user3-avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfWvh9z9ytTSVTMfFgS8SACRUMnlSnkVYnbFwo8ZBqzspoXTHOd-YatBRNf1tV_xkEAI5b9w0MPvoVxB0HfV6MMqpoxRiuyW-T02_lNIH-DbpeXg7vmoVQ8cSI_eZiT4-owMCsBUMSpzcineteH1cAfQGPn11iA5obDljsVXA1lVkF98V9uAHZdW-Uf7Kk31uOxO0_4QXBHjvwxOqtCohtc3Bkfmxk7KFQfdBIbeOFFessPawp3XCnzlwK9LmCJizX76-yorIC9XF8"/>
+</div>
+<span class="text-xs font-semibold text-secondary" data-editable="hero-students">+200 Học viên thành công</span>
+</div>
+</div>
+</div>
+<!-- Abstract background shape -->
+<div class="absolute -top-20 -right-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+</section>
+<!-- Course Cards Section -->
+<section class="px-6 space-y-6">
+<div class="flex justify-between items-end mb-2">
+<h2 class="font-headline font-bold text-2xl text-on-surface" data-editable="courses-title">Khóa học</h2>
+<span class="text-sm font-bold text-primary underline cursor-pointer">Xem tất cả</span>
+</div>
+<!-- Basic Course Card -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/10 shadow-sm relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-5 pointer-events-none group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-7xl">analytics</span>
+</div>
+<div class="flex justify-between items-start mb-4">
+<span class="bg-secondary-container text-on-secondary-fixed text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider" data-editable="course1-level">Cơ bản (Basic)</span>
+<div class="flex items-center bg-surface-container-low px-2 py-1 rounded-lg gap-1">
+<span class="material-symbols-outlined text-sm text-amber-500" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-xs font-bold" data-editable="course1-rating">4.8</span>
+</div>
+</div>
+<h3 class="font-headline font-extrabold text-xl text-on-surface mb-2" data-editable="course1-title">Khóa: Excel cơ bản đến thành thạo</h3>
+<p class="text-secondary text-sm mb-6 line-clamp-2" data-editable="course1-desc">Thành thạo công thức trong excel, không cần nhớ hàm vẫn có thể sử dụng được.</p>
+<div class="flex items-center justify-between mt-auto">
+<div class="flex flex-col">
+<span class="text-[10px] text-secondary font-bold uppercase tracking-tighter">Thời gian học Zoom</span>
+<div class="flex items-center gap-1.5 text-primary font-bold">
+<span class="material-symbols-outlined text-lg">schedule</span>
+<span class="font-headline" data-editable="course1-time">19:30 - 21:30</span>
+</div>
+</div>
+<button class="cta-trigger bg-primary-container text-white px-4 py-2.5 rounded-lg font-bold text-sm">
+                        Đăng ký
+                    </button>
+</div>
+</div>
+<!-- Advanced Course Card -->
+<div class="bg-surface-container-highest p-6 rounded-xl border border-primary/10 shadow-md relative overflow-hidden ring-1 ring-primary/5">
+<div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+<span class="material-symbols-outlined text-7xl text-primary">monitoring</span>
+</div>
+<div class="flex justify-between items-start mb-4">
+<span class="bg-primary text-on-primary text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider" data-editable="course2-level">Nâng cao (Advanced)</span>
+<div class="flex items-center bg-white/50 backdrop-blur px-2 py-1 rounded-lg gap-1">
+<span class="material-symbols-outlined text-sm text-amber-500" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-xs font-bold" data-editable="course2-rating">5.0</span>
+</div>
+</div>
+<h3 class="font-headline font-extrabold text-xl text-on-surface mb-2" data-editable="course2-title">Khóa: Excel phân tích dữ liệu</h3>
+<p class="text-secondary text-sm mb-6 line-clamp-2" data-editable="course2-desc">Thành thạo các công cụ nâng cao giúp bạn phân tích dữ liệu chuyên nghiệp</p>
+<div class="flex items-center justify-between mt-auto">
+<div class="flex flex-col">
+<span class="text-[10px] text-secondary font-bold uppercase tracking-tighter">Thời gian học Zoom</span>
+<div class="flex items-center gap-1.5 text-primary font-bold">
+<span class="material-symbols-outlined text-lg">videocam</span>
+<span class="font-headline text-lg" data-editable="course2-time">19:30 - 21:30</span>
+</div>
+</div>
+<button class="cta-trigger bg-primary-container text-white px-4 py-2.5 rounded-lg font-bold text-sm">
+                        Đăng ký
+                    </button>
+</div>
+</div>
+</section>
+<!-- Instructor Section -->
+<section class="mt-12 px-6">
+<h2 class="font-headline font-bold text-2xl text-on-surface mb-6" data-editable="instructor-section-title">Giảng viên đồng hành</h2>
+<div class="bg-white rounded-3xl overflow-hidden border border-outline-variant/20 shadow-sm">
+<div class="relative h-64 overflow-hidden">
+<img alt="Thầy Trần Công Kiên" class="w-full h-full object-cover object-top" data-img="instructor-photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGcsNcgMoBrWb6Me-HsWdHxeKceqnNo-Gdkv3w8mN8C6LjdhDIm-s-n6RB0g57RTySp3Xho4IwjuVZ5UqmlJJLKHglDNaWFIS4zkMcfHBdwPiso6kbhLGal8ZOckQczRBvGWwF7KR3FG2H7pgKMNa3CTDjOttCxG81Ud8cgKjLNxixKZVu_FcMkfCV772mO0CtlJ1-INrvXlygzIQPafwl3oisK2qDOraDSVnjw_mVLACbK2wbCOceY48sFkcFqhQuhtsYM_ZNkN6d"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+<div class="absolute bottom-4 left-6">
+<h3 class="font-headline font-extrabold text-2xl text-white" data-editable="instructor-name">Thầy Trần Công Kiên</h3>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-emerald-400 text-sm" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="text-emerald-100 text-xs font-bold uppercase tracking-widest" data-editable="instructor-title">Chuyên gia Excel</span>
+</div>
+</div>
+</div>
+<div class="p-6">
+<p class="text-primary font-bold text-sm mb-3" data-editable="instructor-tagline">Người đầu tiên hướng dẫn bạn không cần nhớ công thức vẫn dùng được hàm Excel</p>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6 italic" data-editable="instructor-bio">
+                        "Với hơn 10 năm kinh nghiệm đào tạo và tư vấn giải pháp dữ liệu cho các tập đoàn đa quốc gia. Phương pháp giảng dạy thực chiến, dễ hiểu, giúp học viên làm chủ công cụ ngay trong buổi học."
+                    </p>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-surface-container rounded-full text-[10px] font-bold text-secondary uppercase" data-editable="instructor-exp">10+ Năm Kinh nghiệm</span>
+<span class="px-3 py-1 bg-surface-container rounded-full text-[10px] font-bold text-secondary uppercase" data-editable="instructor-followers">200K Followers </span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Why Master Excel? -->
+<section class="mt-12 px-6">
+<h2 class="font-headline font-bold text-2xl text-on-surface mb-6" data-editable="why-title">Tại sao bạn nên làm chủ Excel?</h2>
+<div class="grid grid-cols-1 gap-4">
+<div class="flex items-start gap-4 p-4 bg-white rounded-2xl border border-outline-variant/10">
+<div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary">trending_up</span>
+</div>
+<div>
+<h4 class="font-headline font-bold text-on-surface mb-1" data-editable="why1-title">Cơ hội thăng tiến</h4>
+<p class="text-sm text-secondary leading-relaxed" data-editable="why1-desc">Nâng cao giá trị bản thân trong mắt nhà tuyển dụng và cấp trên.</p>
+</div>
+</div>
+<div class="flex items-start gap-4 p-4 bg-white rounded-2xl border border-outline-variant/10">
+<div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary">speed</span>
+</div>
+<div>
+<h4 class="font-headline font-bold text-on-surface mb-1" data-editable="why2-title">Hiệu suất vượt trội</h4>
+<p class="text-sm text-secondary leading-relaxed" data-editable="why2-desc">Xử lý khối lượng công việc khổng lồ chỉ trong vài phút thay vì hàng giờ.</p>
+</div>
+</div>
+<div class="flex items-start gap-4 p-4 bg-white rounded-2xl border border-outline-variant/10">
+<div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary">workspace_premium</span>
+</div>
+<div>
+<h4 class="font-headline font-bold text-on-surface mb-1" data-editable="why3-title">Uy tín chuyên nghiệp</h4>
+<p class="text-sm text-secondary leading-relaxed" data-editable="why3-desc">Báo cáo chuẩn chỉnh, dữ liệu chính xác tạo niềm tin tuyệt đối.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Post-Course Benefits -->
+<section class="mt-12 px-6">
+<h2 class="font-headline font-bold text-2xl text-on-surface mb-6" data-editable="benefits-title">Lợi ích sau khóa học</h2>
+<div class="grid grid-cols-2 gap-3">
+<div class="bg-emerald-50 p-4 rounded-2xl flex flex-col gap-3">
+<span class="material-symbols-outlined text-primary text-3xl">auto_fix_high</span>
+<span class="text-xs font-bold text-on-surface leading-tight" data-editable="benefit1">Tự động hóa báo cáo</span>
+</div>
+<div class="bg-emerald-50 p-4 rounded-2xl flex flex-col gap-3">
+<span class="material-symbols-outlined text-primary text-3xl">database</span>
+<span class="text-xs font-bold text-on-surface leading-tight" data-editable="benefit2">Phân tích Big Data</span>
+</div>
+<div class="bg-emerald-50 p-4 rounded-2xl flex flex-col gap-3">
+<span class="material-symbols-outlined text-primary text-3xl">timer</span>
+<span class="text-xs font-bold text-on-surface leading-tight" data-editable="benefit3">Tiết kiệm 80% thời gian</span>
+</div>
+<div class="bg-emerald-50 p-4 rounded-2xl flex flex-col gap-3">
+<span class="material-symbols-outlined text-primary text-3xl">dashboard_customize</span>
+<span class="text-xs font-bold text-on-surface leading-tight" data-editable="benefit4">Thiết kế Dashboard</span>
+</div>
+</div>
+</section>
+<!-- Section: Special Gifts -->
+<section class="mt-12 px-6">
+<div class="bg-surface-container-lowest border-2 border-dashed border-primary/30 rounded-3xl p-6 relative overflow-hidden">
+<div class="absolute -top-6 -right-6 w-24 h-24 bg-primary/5 rounded-full"></div>
+<h2 class="font-headline font-bold text-2xl text-on-surface mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-amber-500" style="font-variation-settings: 'FILL' 1;">card_giftcard</span>
+                    <span data-editable="gifts-title">Quà tặng đặc biệt</span>
+                </h2>
+<ul class="space-y-4">
+<li class="flex items-center gap-3">
+<div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-xs">check</span>
+</div>
+<span class="text-sm font-semibold text-on-surface-variant" data-editable="gift1">E-book phím tắt Excel độc quyền</span>
+</li>
+<li class="flex items-center gap-3">
+<div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-xs">check</span>
+</div>
+<span class="text-sm font-semibold text-on-surface-variant" data-editable="gift2">50+ Premium Dashboard Templates</span>
+</li>
+<li class="flex items-center gap-3">
+<div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-xs">check</span>
+</div>
+<span class="text-sm font-semibold text-on-surface-variant" data-editable="gift3">Tham gia Group hỗ trợ trọn đời</span>
+</li>
+</ul>
+<div class="mt-6 p-4 bg-primary/5 rounded-xl text-center">
+<p class="text-xs font-bold text-primary uppercase tracking-widest" data-editable="gifts-value">Tổng trị giá quà tặng &gt; 2.000.000đ</p>
+</div>
+</div>
+</section>
+<!-- Section: Student Reviews -->
+<section class="mt-12 px-6">
+<h2 class="font-headline font-bold text-2xl text-on-surface mb-6" data-editable="reviews-title">Học viên nói gì về chúng tôi</h2>
+<div class="flex flex-col gap-4">
+<!-- Testimonial 1 -->
+<div class="bg-white p-5 rounded-3xl border border-outline-variant/10 shadow-sm">
+<div class="flex items-center gap-3 mb-4">
+<img alt="Nguyễn Minh Anh" class="w-12 h-12 rounded-full object-cover" data-img="review1-avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZnLftPCOrie3O9KMgGqFBZmxU7Y7xSgTbCOSLayYFz4lrIC33lpOQDD-ApwKi4ZK3hkP9WVYA8NPzCMer7Io6mIZ3JhzEgYuJ7a_SnFn5QTso7LCr3X6z7U1SqIZi18Nm-NpwEwaPjvGGBubqVlZLqaCQqXymymELqsGw38JYTVfnhz_Z9f_CN7CXOf5pNCKgTNAw77sYGWQ9gg1JQC5j_as6pcuC3ptT6hGMxgaSbdQE1BPfILk6ZeKiMOUyrADsMFyfwE7dGXtT"/>
+<div>
+<h4 class="font-headline font-bold text-sm text-on-surface" data-editable="review1-name">Minh Anh</h4>
+<p class="text-[10px] text-secondary font-medium uppercase tracking-wider" data-editable="review1-role">Phó phòng nhân sự</p>
+</div>
+<div class="ml-auto flex">
+<span class="material-symbols-outlined text-amber-400 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-amber-400 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-amber-400 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-amber-400 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-amber-400 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<p class="text-sm text-on-surface-variant leading-relaxed" data-editable="review1-text">"Khóa học giúp tôi tự động hóa hoàn toàn các báo cáo tài chính hàng tháng. Tiết kiệm được ít nhất 3 ngày làm việc mỗi tháng để tập trung vào phân tích."</p>
+</div>
+<!-- Testimonial 2 -->
+<div class="bg-white p-5 rounded-3xl border border-outline-variant/10 shadow-sm">
+<div class="flex items-center gap-3 mb-4">
+<img alt="Trần Thu Hà" class="w-12 h-12 rounded-full object-cover" data-img="review2-avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfWvh9z9ytTSVTMfFgS8SACRUMnlSnkVYnbFwo8ZBqzspoXTHOd-YatBRNf1tV_xkEAI5b9w0MPvoVxB0HfV6MMqpoxRiuyW-T02_lNIH-DbpeXg7vmoVQ8cSI_eZiT4-owMCsBUMSpzcineteH1cAfQGPn11iA5obDljsVXA1lVkF98V9uAHZdW-Uf7Kk31uOxO0_4QXBHjvwxOqtCohtc3Bkfmxk7KFQfdBIbeOFFessPawp3XCnzlwK9LmCJizX76-yorIC9XF8"/>
+<div>
+<h4 class="font-headline font-bold text-sm text-on-surface" data-editable="review2-name">Trần Thu Hà</h4>
+<p class="text-[10px] text-secondary font-medium uppercase tracking-wider" data-editable="review2-role">Chuyên viên Nhân sự</p>
+</div>
+<div class="ml-auto flex">
+<span class="material-symbols-outlined text-amber-400 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-amber-400 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-amber-400 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-amber-400 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-amber-400 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<p class="text-sm text-on-surface-variant leading-relaxed" data-editable="review2-text">"Phương pháp thực chiến của thầy Nam cực kỳ dễ hiểu. Nhờ các kỹ năng Excel nâng cao mà tôi đã được thăng chức lên vị trí quản lý sau 3 tháng."</p>
+</div>
+<!-- Testimonial 3 -->
+<div class="bg-white p-5 rounded-3xl border border-outline-variant/10 shadow-sm">
+<div class="flex items-center gap-3 mb-4">
+<img alt="Lê Thu Trang" class="w-12 h-12 rounded-full object-cover" data-img="review3-avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCC4yVSxAK4Pibst_8QrbQTFEnmVGx1TbIE8RQcgB-2Q7lrYEjMofTThRhrDU4AJ1_VSxEZFRMqafITSA1G4ytYLbqYjPgxLxen-wJdPby5jd_fyYUP_EIRlkLfmBMwAm_4n7zDg0cjhR7XOvZqcAw6rYDZU5m2IrKMBUcn-oo3NPGu7xD7u2mPM4rYpzuhyP_Y-5Ay8LmrPMsDWjaLnsFeHO9OViuODWvV-aJjPo1dwxFzW66lHO-usm_sbDvhwMB9gZc5FYLimwu8"/>
+<div>
+<h4 class="font-headline font-bold text-sm text-on-surface" data-editable="review3-name">Lê Thu Trang</h4>
+<p class="text-[10px] text-secondary font-medium uppercase tracking-wider" data-editable="review3-role">Phân tích dữ liệu</p>
+</div>
+<div class="ml-auto flex">
+<span class="material-symbols-outlined text-amber-400 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-amber-400 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-amber-400 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-amber-400 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-amber-400 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<p class="text-sm text-on-surface-variant leading-relaxed" data-editable="review3-text">"Học xong mới thấy mình đã lãng phí bao nhiêu thời gian trước đây. Dashboard chuyên nghiệp giúp tôi ghi điểm tuyệt đối trong mắt sếp."</p>
+</div>
+</div>
+</section>
+<!-- Section: Student Results Gallery -->
+<section class="mt-12" id="gallerySection">
+<div class="px-6 mb-4 flex justify-between items-end">
+    <div>
+        <h2 class="font-headline font-bold text-2xl text-on-surface" data-editable="gallery-title">Kết quả học viên</h2>
+        <p class="text-sm text-secondary mt-1" data-editable="gallery-subtitle">Dashboard thực tế do học viên tạo ra sau khóa học</p>
+    </div>
+    <div class="flex items-center gap-1 text-xs text-secondary font-medium">
+        <span class="material-symbols-outlined text-base">swipe</span>
+        Vuốt
+    </div>
+</div>
+<div class="gallery-track px-6" id="galleryTrack">
+    <!-- Gallery Item 1 -->
+    <div class="gallery-item" data-gallery-idx="0" style="position:relative;">
+        <button class="gallery-delete-btn" onclick="deleteGalleryItem(0)"><span class="material-symbols-outlined">close</span></button>
+        <img class="gallery-item-img" data-img="gallery-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCC4yVSxAK4Pibst_8QrbQTFEnmVGx1TbIE8RQcgB-2Q7lrYEjMofTThRhrDU4AJ1_VSxEZFRMqafITSA1G4ytYLbqYjPgxLxen-wJdPby5jd_fyYUP_EIRlkLfmBMwAm_4n7zDg0cjhR7XOvZqcAw6rYDZU5m2IrKMBUcn-oo3NPGu7xD7u2mPM4rYpzuhyP_Y-5Ay8LmrPMsDWjaLnsFeHO9OViuODWvV-aJjPo1dwxFzW66lHO-usm_sbDvhwMB9gZc5FYLimwu8" alt="Dashboard học viên"/>
+        <div class="gallery-item-body">
+            <h4 class="font-headline font-bold text-sm text-on-surface" data-editable="gallery-0-name">Nguyễn Văn A</h4>
+            <p class="text-[11px] text-secondary mt-0.5" data-editable="gallery-0-desc">Dashboard phân tích doanh thu theo quý</p>
+        </div>
+    </div>
+    <!-- Gallery Item 2 -->
+    <div class="gallery-item" data-gallery-idx="1" style="position:relative;">
+        <button class="gallery-delete-btn" onclick="deleteGalleryItem(1)"><span class="material-symbols-outlined">close</span></button>
+        <img class="gallery-item-img" data-img="gallery-1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZnLftPCOrie3O9KMgGqFBZmxU7Y7xSgTbCOSLayYFz4lrIC33lpOQDD-ApwKi4ZK3hkP9WVYA8NPzCMer7Io6mIZ3JhzEgYuJ7a_SnFn5QTso7LCr3X6z7U1SqIZi18Nm-NpwEwaPjvGGBubqVlZLqaCQqXymymELqsGw38JYTVfnhz_Z9f_CN7CXOf5pNCKgTNAw77sYGWQ9gg1JQC5j_as6pcuC3ptT6hGMxgaSbdQE1BPfILk6ZeKiMOUyrADsMFyfwE7dGXtT" alt="Dashboard học viên"/>
+        <div class="gallery-item-body">
+            <h4 class="font-headline font-bold text-sm text-on-surface" data-editable="gallery-1-name">Trần Thị B</h4>
+            <p class="text-[11px] text-secondary mt-0.5" data-editable="gallery-1-desc">Báo cáo nhân sự tự động hóa</p>
+        </div>
+    </div>
+    <!-- Gallery Item 3 -->
+    <div class="gallery-item" data-gallery-idx="2" style="position:relative;">
+        <button class="gallery-delete-btn" onclick="deleteGalleryItem(2)"><span class="material-symbols-outlined">close</span></button>
+        <img class="gallery-item-img" data-img="gallery-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfWvh9z9ytTSVTMfFgS8SACRUMnlSnkVYnbFwo8ZBqzspoXTHOd-YatBRNf1tV_xkEAI5b9w0MPvoVxB0HfV6MMqpoxRiuyW-T02_lNIH-DbpeXg7vmoVQ8cSI_eZiT4-owMCsBUMSpzcineteH1cAfQGPn11iA5obDljsVXA1lVkF98V9uAHZdW-Uf7Kk31uOxO0_4QXBHjvwxOqtCohtc3Bkfmxk7KFQfdBIbeOFFessPawp3XCnzlwK9LmCJizX76-yorIC9XF8" alt="Dashboard học viên"/>
+        <div class="gallery-item-body">
+            <h4 class="font-headline font-bold text-sm text-on-surface" data-editable="gallery-2-name">Lê Minh C</h4>
+            <p class="text-[11px] text-secondary mt-0.5" data-editable="gallery-2-desc">Dashboard KPI theo phòng ban</p>
+        </div>
+    </div>
+    <!-- Add button (admin only) -->
+    <div class="gallery-add-btn" id="galleryAddBtn" onclick="addGalleryItem()">
+        <span class="material-symbols-outlined text-4xl text-primary/50">add_photo_alternate</span>
+        <span class="text-xs font-bold text-primary/60">Thêm ảnh</span>
+    </div>
+</div>
+<div class="gallery-dots px-6" id="galleryDots"></div>
+</section>
+<!-- Why Choose Us / Trust Section -->
+<section class="mt-12 px-6">
+<div class="bg-emerald-900 rounded-3xl p-8 text-white relative overflow-hidden">
+<div class="absolute right-0 bottom-0 opacity-10 translate-x-1/4 translate-y-1/4">
+<span class="material-symbols-outlined text-[180px]">workspace_premium</span>
+</div>
+<h4 class="font-headline font-black text-3xl mb-4 leading-none" data-editable="trust-stat">98%</h4>
+<p class="text-emerald-100/80 font-medium mb-6" data-editable="trust-desc">Học viên thăng tiến và nhận mức lương cao hơn sau khóa học Advanced Excel.</p>
+<div class="h-1 w-12 bg-emerald-400 rounded-full mb-8"></div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-1">
+<span class="text-xs font-bold uppercase tracking-widest text-emerald-300" data-editable="trust-label1">Hỗ trợ</span>
+<span class="text-sm font-semibold italic" data-editable="trust-value1">Trọn đời</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-xs font-bold uppercase tracking-widest text-emerald-300" data-editable="trust-label2">Tài liệu</span>
+<span class="text-sm font-semibold italic" data-editable="trust-value2">Bản quyền</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Final CTA Section -->
+<section class="mt-12 px-6 pb-12">
+<div class="bg-primary p-8 rounded-3xl text-center relative overflow-hidden shadow-2xl">
+<!-- Background decorative grid effect -->
+<div class="absolute inset-0 opacity-10 cell-grid-bg pointer-events-none"></div>
+<div class="relative z-10">
+<h2 class="font-headline font-extrabold text-3xl text-white mb-4 leading-tight" data-editable="cta-title">
+                        Bắt đầu làm chủ Excel ngay hôm nay!
+                    </h2>
+<p class="text-emerald-100/90 font-medium mb-8 text-sm" data-editable="cta-desc">
+                        Lộ trình thực chiến qua Zoom: <span class="font-bold">19:30 - 21:30</span>. Đồng hành cùng chuyên gia.
+                    </p>
+<button class="cta-trigger w-full py-5 bg-white text-primary rounded-2xl font-headline font-black text-xl shadow-xl flex items-center justify-center gap-3 active:scale-[0.98] transition-transform">
+                        <span data-editable="cta-btn">Đăng ký ngay</span>
+                        <span class="material-symbols-outlined text-2xl">arrow_forward</span>
+</button>
+<div class="mt-6 flex items-center justify-center gap-2">
+<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+<span class="text-[11px] text-emerald-100 font-bold uppercase tracking-widest" data-editable="cta-urgency">Ưu đãi còn 5 suất cuối cùng</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-xl bg-white/90 backdrop-blur-xl flex justify-around items-center h-16 pb-safe px-6 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+<a class="flex flex-col items-center justify-center text-emerald-700 font-bold scale-110" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+<span class="font-['Inter'] text-[10px] font-medium uppercase tracking-wider mt-1">Modules</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-400" href="#">
+<span class="material-symbols-outlined">videocam</span>
+<span class="font-['Inter'] text-[10px] font-medium uppercase tracking-wider mt-1">Live</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-400" href="#">
+<span class="material-symbols-outlined">edit_note</span>
+<span class="font-['Inter'] text-[10px] font-medium uppercase tracking-wider mt-1">Notes</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-400" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-['Inter'] text-[10px] font-medium uppercase tracking-wider mt-1">Profile</span>
+</a>
+</nav>
+<!-- Contextual Floating Action Button (Only for Enrollment) -->
+<div class="fixed bottom-20 right-6 z-40">
+<button class="cta-trigger w-14 h-14 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-3xl">chat_bubble</span>
+</button>
+</div>
+
+<!-- CTA Popup -->
+<div class="cta-popup-overlay" id="ctaPopup">
+    <div class="cta-popup-box">
+        <div class="cta-popup-handle"></div>
+
+        <!-- Thank you message -->
+        <div class="text-center mb-5">
+            <div class="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                <span class="material-symbols-outlined text-primary text-3xl">favorite</span>
+            </div>
+            <h3 class="font-headline font-extrabold text-xl text-on-surface" data-editable="cta-popup-title">Cảm ơn bạn đã quan tâm đến khóa học</h3>
+        </div>
+
+        <!-- Star rating -->
+        <div class="mb-5">
+            <p class="text-center text-sm font-semibold text-secondary mb-3" data-editable="cta-popup-rating-label">Mức độ quan tâm của bạn đến khóa học</p>
+            <div class="star-rating" id="starRating">
+                <button class="star-btn" data-star="1"><span class="material-symbols-outlined">star</span></button>
+                <button class="star-btn" data-star="2"><span class="material-symbols-outlined">star</span></button>
+                <button class="star-btn" data-star="3"><span class="material-symbols-outlined">star</span></button>
+                <button class="star-btn" data-star="4"><span class="material-symbols-outlined">star</span></button>
+                <button class="star-btn" data-star="5"><span class="material-symbols-outlined">star</span></button>
+            </div>
+            <p class="text-center text-xs text-secondary/60 mt-2 font-medium" id="starLabel">Nhấp để đánh giá</p>
+        </div>
+
+        <!-- Divider -->
+        <div class="h-px bg-outline-variant/20 mb-5"></div>
+
+        <!-- Zalo CTA -->
+        <a href="https://zalo.me/0987382200" target="_blank" id="zaloLink" class="zalo-btn mb-4">
+            <svg width="24" height="24" viewBox="0 0 48 48" fill="none"><ellipse cx="24" cy="24" rx="24" ry="24" fill="white" fill-opacity="0.2"/><path d="M12.5 17.5h23v2.2L20.2 33.5H36v3H12.5v-2.2L27.8 20.5H13v-3z" fill="white"/></svg>
+            <span data-editable="cta-popup-zalo-text">Liên hệ Zalo giảng viên</span>
+        </a>
+
+        <!-- Instructor contact card -->
+        <div class="instructor-contact-card">
+            <img class="instructor-contact-avatar" data-img="cta-instructor-avatar" id="ctaInstructorAvatar"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGcsNcgMoBrWb6Me-HsWdHxeKceqnNo-Gdkv3w8mN8C6LjdhDIm-s-n6RB0g57RTySp3Xho4IwjuVZ5UqmlJJLKHglDNaWFIS4zkMcfHBdwPiso6kbhLGal8ZOckQczRBvGWwF7KR3FG2H7pgKMNa3CTDjOttCxG81Ud8cgKjLNxixKZVu_FcMkfCV772mO0CtlJ1-INrvXlygzIQPafwl3oisK2qDOraDSVnjw_mVLACbK2wbCOceY48sFkcFqhQuhtsYM_ZNkN6d"
+                alt="Giảng viên"/>
+            <div class="flex-1 min-w-0">
+                <p class="font-headline font-bold text-sm text-on-surface" data-editable="cta-popup-instructor-name">Thầy Trần Công Kiên</p>
+                <a href="https://zalo.me/0987382200" target="_blank" class="flex items-center gap-1.5 mt-1 hover:opacity-80 transition-opacity">
+                    <span class="material-symbols-outlined text-[#0068ff] text-base">chat</span>
+                    <span class="text-sm font-bold text-[#0068ff] tracking-wide" data-editable="cta-popup-phone">0987382200</span>
+                </a>
+            </div>
+            <a href="https://zalo.me/0987382200" target="_blank" class="w-10 h-10 bg-[#0068ff]/10 rounded-xl flex items-center justify-center flex-shrink-0 hover:bg-[#0068ff]/20 transition-colors">
+                <span class="material-symbols-outlined text-[#0068ff]">chat</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================
+// ADMIN SYSTEM - Hidden Login & Content Editor
+// ============================================
+
+// === CONFIGURATION ===
+const ADMIN_CREDENTIALS = {
+    username: 'admin',
+    password: 'excel2024'
+};
+
+const STORAGE_KEY = 'admin_content_data';
+const IMG_STORAGE_KEY = 'admin_image_data';
+const SESSION_KEY = 'admin_logged_in';
+
+// === STATE ===
+let isAdminMode = false;
+let clickCount = 0;
+let clickTimer = null;
+let currentEditingImg = null; // currently editing image element
+
+// === ELEMENTS ===
+const adminTrigger = document.getElementById('adminTrigger');
+const adminOverlay = document.getElementById('adminOverlay');
+const adminLoginBox = document.getElementById('adminLoginBox');
+const adminToolbar = document.getElementById('adminToolbar');
+const mainHeader = document.getElementById('mainHeader');
+const adminUser = document.getElementById('adminUser');
+const adminPass = document.getElementById('adminPass');
+const loginError = document.getElementById('loginError');
+const toastEl = document.getElementById('toast');
+const imgEditModal = document.getElementById('imgEditModal');
+const imgUrlInput = document.getElementById('imgUrlInput');
+const imgPreview = document.getElementById('imgPreview');
+const imgFileInput = document.getElementById('imgFileInput');
+
+// === HIDDEN TRIGGER: Triple-click bottom-left corner ===
+adminTrigger.addEventListener('click', function(e) {
+    clickCount++;
+    if (clickCount === 1) {
+        clickTimer = setTimeout(() => { clickCount = 0; }, 800);
+    }
+    if (clickCount >= 3) {
+        clearTimeout(clickTimer);
+        clickCount = 0;
+        openLoginModal();
+    }
+});
+
+// Keyboard shortcut: Ctrl+Shift+L
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.shiftKey && e.key === 'L') {
+        e.preventDefault();
+        if (isAdminMode) {
+            logoutAdmin();
+        } else {
+            openLoginModal();
+        }
+    }
+});
+
+// === LOGIN MODAL ===
+function openLoginModal() {
+    adminOverlay.classList.add('active');
+    adminUser.value = '';
+    adminPass.value = '';
+    loginError.classList.add('hidden');
+    setTimeout(() => adminUser.focus(), 300);
+}
+
+function closeLoginModal() {
+    adminOverlay.classList.remove('active');
+}
+
+document.getElementById('adminCloseBtn').addEventListener('click', closeLoginModal);
+adminOverlay.addEventListener('click', function(e) {
+    if (e.target === adminOverlay) closeLoginModal();
+});
+
+// Toggle password visibility
+document.getElementById('togglePassBtn').addEventListener('click', function() {
+    const passInput = document.getElementById('adminPass');
+    const icon = document.getElementById('togglePassIcon');
+    if (passInput.type === 'password') {
+        passInput.type = 'text';
+        icon.textContent = 'visibility';
+    } else {
+        passInput.type = 'password';
+        icon.textContent = 'visibility_off';
+    }
+});
+
+// Login action
+document.getElementById('adminLoginBtn').addEventListener('click', attemptLogin);
+adminPass.addEventListener('keydown', function(e) { if (e.key === 'Enter') attemptLogin(); });
+adminUser.addEventListener('keydown', function(e) { if (e.key === 'Enter') adminPass.focus(); });
+
+function attemptLogin() {
+    const user = adminUser.value.trim();
+    const pass = adminPass.value.trim();
+    if (user === ADMIN_CREDENTIALS.username && pass === ADMIN_CREDENTIALS.password) {
+        closeLoginModal();
+        enterAdminMode();
+        sessionStorage.setItem(SESSION_KEY, 'true');
+        showToast('Đăng nhập thành công! Nhấp vào nội dung hoặc ảnh để chỉnh sửa.', 'success');
+    } else {
+        loginError.classList.remove('hidden');
+        adminLoginBox.classList.add('shake');
+        setTimeout(() => adminLoginBox.classList.remove('shake'), 500);
+    }
+}
+
+// === ADMIN MODE ===
+function enterAdminMode() {
+    isAdminMode = true;
+    document.body.classList.add('admin-mode');
+    adminToolbar.classList.add('active');
+    mainHeader.style.top = '46px';
+    document.querySelector('main').style.paddingTop = 'calc(4rem + 46px)';
+
+    // Make text editable
+    document.querySelectorAll('[data-editable]').forEach(el => {
+        el.classList.add('admin-editable');
+        el.setAttribute('contenteditable', 'true');
+        el.setAttribute('spellcheck', 'false');
+    });
+
+    // Make images clickable to edit
+    setupImageEditing();
+
+    // Enable gallery item image clicks & editable fields
+    document.querySelectorAll('.gallery-item [data-img]').forEach(img => {
+        img.style.cursor = 'pointer';
+        img.onclick = function(e) {
+            if (!isAdminMode) return;
+            e.preventDefault();
+            e.stopPropagation();
+            openImageEditModal(img);
+        };
+    });
+    document.querySelectorAll('.gallery-item [data-editable]').forEach(el => {
+        el.classList.add('admin-editable');
+        el.setAttribute('contenteditable', 'true');
+        el.setAttribute('spellcheck', 'false');
+    });
+}
+
+function exitAdminMode() {
+    isAdminMode = false;
+    document.body.classList.remove('admin-mode');
+    adminToolbar.classList.remove('active');
+    mainHeader.style.top = '0';
+    document.querySelector('main').style.paddingTop = '4rem';
+
+    document.querySelectorAll('[data-editable]').forEach(el => {
+        el.classList.remove('admin-editable');
+        el.removeAttribute('contenteditable');
+    });
+
+    // Remove image edit badges and admin click-through
+    document.querySelectorAll('.img-edit-badge').forEach(b => b.remove());
+    document.querySelectorAll('.admin-click-through').forEach(el => el.classList.remove('admin-click-through'));
+    document.querySelectorAll('.img-edit-badge-container').forEach(el => el.classList.remove('img-edit-badge-container'));
+    document.querySelectorAll('[data-img]').forEach(img => {
+        img.style.cursor = '';
+        img.style.zIndex = '';
+        img.style.position = '';
+        img.onclick = null;
+    });
+}
+
+// === IMAGE EDITING ===
+function setupImageEditing() {
+    document.querySelectorAll('[data-img]').forEach(img => {
+        // Find the positioning parent
+        const parent = img.parentElement;
+        if (getComputedStyle(parent).position === 'static') {
+            parent.style.position = 'relative';
+        }
+
+        // Make sibling overlay divs click-through in admin mode
+        // (fixes gradient overlay blocking instructor photo click)
+        Array.from(parent.children).forEach(sibling => {
+            if (sibling !== img && sibling.tagName !== 'DIV') return;
+            if (sibling === img) return;
+            const pos = getComputedStyle(sibling).position;
+            if (pos === 'absolute' || pos === 'fixed') {
+                sibling.classList.add('admin-click-through');
+            }
+        });
+
+        // Add edit badge on the container level
+        parent.classList.add('img-edit-badge-container');
+        if (!parent.querySelector('.img-edit-badge')) {
+            const badge = document.createElement('div');
+            badge.className = 'img-edit-badge';
+            badge.innerHTML = '<span class="material-symbols-outlined">photo_camera</span>';
+            badge.style.zIndex = '50';
+            parent.appendChild(badge);
+
+            // Badge click also triggers edit
+            badge.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                openImageEditModal(img);
+            });
+        }
+
+        // Make the image itself higher z-index and clickable
+        img.style.position = 'relative';
+        img.style.zIndex = '5';
+        img.style.cursor = 'pointer';
+
+        // Click handler on image
+        img.onclick = function(e) {
+            if (!isAdminMode) return;
+            e.preventDefault();
+            e.stopPropagation();
+            openImageEditModal(img);
+        };
+
+        // Also allow clicking the parent container area
+        parent.addEventListener('click', function(e) {
+            if (!isAdminMode) return;
+            // Only if the click target is the parent or an overlay div (not other interactive elements)
+            if (e.target === parent || e.target.classList.contains('admin-click-through')) {
+                e.preventDefault();
+                e.stopPropagation();
+                openImageEditModal(img);
+            }
+        });
+    });
+}
+
+function openImageEditModal(imgEl) {
+    currentEditingImg = imgEl;
+    imgUrlInput.value = '';
+    imgPreview.src = imgEl.src;
+    imgPreview.style.display = 'block';
+    imgEditModal.classList.add('active');
+    setTimeout(() => imgUrlInput.focus(), 300);
+}
+
+function closeImageEditModal() {
+    imgEditModal.classList.remove('active');
+    currentEditingImg = null;
+    imgUrlInput.value = '';
+}
+
+// URL input - live preview
+imgUrlInput.addEventListener('input', function() {
+    const url = imgUrlInput.value.trim();
+    if (url) {
+        imgPreview.src = url;
+        imgPreview.style.display = 'block';
+    }
+});
+
+// Upload button
+document.getElementById('imgUploadBtn').addEventListener('click', function() {
+    imgFileInput.click();
+});
+
+// File selected
+imgFileInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+        showToast('Vui lòng chọn file ảnh!', 'error');
+        return;
+    }
+    // Check file size (max 2MB for localStorage)
+    if (file.size > 2 * 1024 * 1024) {
+        showToast('Ảnh quá lớn! Tối đa 2MB.', 'error');
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        const dataUrl = ev.target.result;
+        imgUrlInput.value = dataUrl.substring(0, 50) + '... (file uploaded)';
+        imgUrlInput.dataset.fileData = dataUrl;
+        imgPreview.src = dataUrl;
+        imgPreview.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+    // Reset input so same file can be selected again
+    imgFileInput.value = '';
+});
+
+// Save image
+document.getElementById('imgSaveBtn').addEventListener('click', function() {
+    if (!currentEditingImg) return;
+    let newSrc = '';
+
+    // Check if file was uploaded
+    if (imgUrlInput.dataset.fileData) {
+        newSrc = imgUrlInput.dataset.fileData;
+        delete imgUrlInput.dataset.fileData;
+    } else {
+        newSrc = imgUrlInput.value.trim();
+    }
+
+    if (!newSrc) {
+        showToast('Vui lòng nhập URL hoặc tải ảnh lên!', 'error');
+        return;
+    }
+
+    currentEditingImg.src = newSrc;
+    closeImageEditModal();
+    showToast('Đã thay đổi hình ảnh! Nhấn "Lưu" để giữ thay đổi.', 'success');
+});
+
+// Cancel image edit
+document.getElementById('imgCancelBtn').addEventListener('click', closeImageEditModal);
+imgEditModal.addEventListener('click', function(e) {
+    if (e.target === imgEditModal) closeImageEditModal();
+});
+
+// === SAVE / LOAD / RESET ===
+function saveContent() {
+    // Save text content
+    const textData = {};
+    document.querySelectorAll('[data-editable]').forEach(el => {
+        textData[el.getAttribute('data-editable')] = el.innerHTML;
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(textData));
+
+    // Save image sources
+    const imgData = {};
+    document.querySelectorAll('[data-img]').forEach(img => {
+        // Skip gallery images (saved separately)
+        if (img.getAttribute('data-img').startsWith('gallery-')) return;
+        imgData[img.getAttribute('data-img')] = img.src;
+    });
+    localStorage.setItem(IMG_STORAGE_KEY, JSON.stringify(imgData));
+
+    // Save gallery data
+    saveGalleryData();
+
+    showToast('Đã lưu tất cả thay đổi!', 'success');
+}
+
+function loadContent() {
+    // Load text
+    const savedText = localStorage.getItem(STORAGE_KEY);
+    if (savedText) {
+        try {
+            const data = JSON.parse(savedText);
+            Object.keys(data).forEach(key => {
+                const el = document.querySelector(`[data-editable="${key}"]`);
+                if (el) el.innerHTML = data[key];
+            });
+        } catch(e) { console.error('Error loading text:', e); }
+    }
+
+    // Load images
+    const savedImg = localStorage.getItem(IMG_STORAGE_KEY);
+    if (savedImg) {
+        try {
+            const data = JSON.parse(savedImg);
+            Object.keys(data).forEach(key => {
+                const img = document.querySelector(`[data-img="${key}"]`);
+                if (img) img.src = data[key];
+            });
+        } catch(e) { console.error('Error loading images:', e); }
+    }
+}
+
+function resetContent() {
+    if (confirm('Bạn có chắc muốn khôi phục nội dung mặc định? Tất cả chỉnh sửa sẽ bị mất.')) {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(IMG_STORAGE_KEY);
+        localStorage.removeItem(GALLERY_STORAGE_KEY);
+        location.reload();
+    }
+}
+
+function logoutAdmin() {
+    exitAdminMode();
+    sessionStorage.removeItem(SESSION_KEY);
+    showToast('Đã đăng xuất khỏi chế độ quản trị.', 'info');
+}
+
+// === CTA POPUP ===
+const ctaPopup = document.getElementById('ctaPopup');
+const starRating = document.getElementById('starRating');
+const starLabel = document.getElementById('starLabel');
+const starLabels = ['', 'Hơi quan tâm', 'Quan tâm', 'Khá quan tâm', 'Rất quan tâm', 'Cực kỳ quan tâm!'];
+let selectedStars = 0;
+
+// Open popup from all CTA buttons
+document.querySelectorAll('.cta-trigger').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        // Don't open popup in admin mode when editing text inside button
+        if (isAdminMode && e.target.hasAttribute('data-editable')) return;
+        e.preventDefault();
+        openCtaPopup();
+    });
+});
+
+function openCtaPopup() {
+    // Reset stars
+    selectedStars = 0;
+    starRating.querySelectorAll('.star-btn').forEach(b => b.classList.remove('active'));
+    starLabel.textContent = 'Nhấp để đánh giá';
+    ctaPopup.classList.add('active');
+}
+
+function closeCtaPopup() {
+    ctaPopup.classList.remove('active');
+}
+
+// Close on overlay click
+ctaPopup.addEventListener('click', function(e) {
+    if (e.target === ctaPopup) closeCtaPopup();
+});
+
+// Star rating interaction
+starRating.querySelectorAll('.star-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        selectedStars = parseInt(this.getAttribute('data-star'));
+        starRating.querySelectorAll('.star-btn').forEach((b, i) => {
+            b.classList.toggle('active', i < selectedStars);
+        });
+        starLabel.textContent = starLabels[selectedStars] || '';
+    });
+
+    // Hover preview
+    btn.addEventListener('mouseenter', function() {
+        const hoverStar = parseInt(this.getAttribute('data-star'));
+        starRating.querySelectorAll('.star-btn').forEach((b, i) => {
+            b.classList.toggle('active', i < hoverStar);
+        });
+    });
+
+    btn.addEventListener('mouseleave', function() {
+        starRating.querySelectorAll('.star-btn').forEach((b, i) => {
+            b.classList.toggle('active', i < selectedStars);
+        });
+    });
+});
+
+// === GALLERY MANAGEMENT ===
+const GALLERY_STORAGE_KEY = 'admin_gallery_data';
+let galleryNextId = 3; // start after default 3 items
+
+function initGalleryDots() {
+    const track = document.getElementById('galleryTrack');
+    const dotsContainer = document.getElementById('galleryDots');
+    if (!track || !dotsContainer) return;
+
+    const items = track.querySelectorAll('.gallery-item');
+    dotsContainer.innerHTML = '';
+    items.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.className = 'gallery-dot' + (i === 0 ? ' active' : '');
+        dotsContainer.appendChild(dot);
+    });
+
+    track.addEventListener('scroll', () => {
+        const scrollLeft = track.scrollLeft;
+        const itemWidth = 296; // 280 + 16 gap
+        const activeIdx = Math.round(scrollLeft / itemWidth);
+        dotsContainer.querySelectorAll('.gallery-dot').forEach((dot, i) => {
+            dot.classList.toggle('active', i === activeIdx);
+        });
+    });
+}
+
+function addGalleryItem() {
+    const track = document.getElementById('galleryTrack');
+    const addBtn = document.getElementById('galleryAddBtn');
+    const idx = galleryNextId++;
+
+    const item = document.createElement('div');
+    item.className = 'gallery-item';
+    item.setAttribute('data-gallery-idx', idx);
+    item.style.position = 'relative';
+    item.innerHTML = `
+        <button class="gallery-delete-btn" onclick="deleteGalleryItem(${idx})"><span class="material-symbols-outlined">close</span></button>
+        <img class="gallery-item-img" data-img="gallery-${idx}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='180' fill='%23e7e8e9'%3E%3Crect width='280' height='180'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23999' font-family='sans-serif' font-size='14'%3ENhấp để thêm ảnh%3C/text%3E%3C/svg%3E" alt="Dashboard học viên"/>
+        <div class="gallery-item-body">
+            <h4 class="font-headline font-bold text-sm text-on-surface" data-editable="gallery-${idx}-name" contenteditable="true" spellcheck="false">Tên học viên</h4>
+            <p class="text-[11px] text-secondary mt-0.5" data-editable="gallery-${idx}-desc" contenteditable="true" spellcheck="false">Mô tả dashboard</p>
+        </div>
+    `;
+
+    track.insertBefore(item, addBtn);
+
+    // Setup image click for new item
+    const newImg = item.querySelector('[data-img]');
+    if (newImg) {
+        newImg.style.cursor = 'pointer';
+        newImg.onclick = function(e) {
+            if (!isAdminMode) return;
+            e.preventDefault();
+            e.stopPropagation();
+            openImageEditModal(newImg);
+        };
+    }
+
+    // Make new editable fields active
+    item.querySelectorAll('[data-editable]').forEach(el => {
+        el.classList.add('admin-editable');
+    });
+
+    initGalleryDots();
+    showToast('Đã thêm ảnh mới! Nhấp vào ảnh để thay thế.', 'success');
+
+    // Scroll to new item
+    setTimeout(() => {
+        item.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }, 100);
+}
+
+function deleteGalleryItem(idx) {
+    if (!confirm('Xóa ảnh kết quả này?')) return;
+    const item = document.querySelector(`[data-gallery-idx="${idx}"]`);
+    if (item) {
+        item.remove();
+        initGalleryDots();
+        showToast('Đã xóa.', 'info');
+    }
+}
+
+function saveGalleryData() {
+    const items = document.querySelectorAll('.gallery-item');
+    const data = [];
+    items.forEach(item => {
+        const idx = item.getAttribute('data-gallery-idx');
+        const img = item.querySelector('[data-img]');
+        const name = item.querySelector(`[data-editable="gallery-${idx}-name"]`);
+        const desc = item.querySelector(`[data-editable="gallery-${idx}-desc"]`);
+        data.push({
+            idx: idx,
+            imgSrc: img ? img.src : '',
+            name: name ? name.innerHTML : '',
+            desc: desc ? desc.innerHTML : ''
+        });
+    });
+    localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify(data));
+}
+
+function loadGalleryData() {
+    const saved = localStorage.getItem(GALLERY_STORAGE_KEY);
+    if (!saved) { initGalleryDots(); return; }
+    try {
+        const data = JSON.parse(saved);
+        const track = document.getElementById('galleryTrack');
+        const addBtn = document.getElementById('galleryAddBtn');
+
+        // Remove existing items
+        track.querySelectorAll('.gallery-item').forEach(el => el.remove());
+
+        // Recreate from saved data
+        data.forEach(item => {
+            const idx = parseInt(item.idx);
+            if (idx >= galleryNextId) galleryNextId = idx + 1;
+
+            const el = document.createElement('div');
+            el.className = 'gallery-item';
+            el.setAttribute('data-gallery-idx', idx);
+            el.style.position = 'relative';
+            el.innerHTML = `
+                <button class="gallery-delete-btn" onclick="deleteGalleryItem(${idx})"><span class="material-symbols-outlined">close</span></button>
+                <img class="gallery-item-img" data-img="gallery-${idx}" src="${item.imgSrc}" alt="Dashboard học viên"/>
+                <div class="gallery-item-body">
+                    <h4 class="font-headline font-bold text-sm text-on-surface" data-editable="gallery-${idx}-name">${item.name}</h4>
+                    <p class="text-[11px] text-secondary mt-0.5" data-editable="gallery-${idx}-desc">${item.desc}</p>
+                </div>
+            `;
+            track.insertBefore(el, addBtn);
+        });
+
+        initGalleryDots();
+    } catch(e) { console.error('Error loading gallery:', e); initGalleryDots(); }
+}
+
+// === TOAST NOTIFICATION ===
+function showToast(message, type = 'info') {
+    toastEl.textContent = message;
+    toastEl.className = `toast ${type} show`;
+    setTimeout(() => { toastEl.classList.remove('show'); }, 3000);
+}
+
+// === INITIALIZATION ===
+loadContent();
+loadGalleryData();
+if (sessionStorage.getItem(SESSION_KEY) === 'true') {
+    enterAdminMode();
+}
+</script>
+
+</body></html>
