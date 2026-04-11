@@ -189,6 +189,81 @@
         .admin-toolbar .btn-reset:hover {
             background: rgba(186,26,26,0.3);
         }
+        .admin-toolbar .btn-export {
+            background: rgba(59,130,246,0.2);
+            color: #93c5fd;
+        }
+        .admin-toolbar .btn-export:hover {
+            background: rgba(59,130,246,0.35);
+        }
+        .admin-toolbar .btn-visitors {
+            background: rgba(245,158,11,0.2);
+            color: #fcd34d;
+        }
+        .admin-toolbar .btn-visitors:hover {
+            background: rgba(245,158,11,0.35);
+        }
+        /* Visitor Dashboard Panel */
+        .visitor-dashboard {
+            position: fixed;
+            top: 46px;
+            right: 0;
+            width: 360px;
+            max-width: 95vw;
+            height: calc(100vh - 46px);
+            background: white;
+            z-index: 9997;
+            box-shadow: -4px 0 30px rgba(0,0,0,0.15);
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .visitor-dashboard.active { transform: translateX(0); }
+        .visitor-dashboard-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e1e3e4;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .visitor-dashboard-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+        .visitor-card {
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid #e1e3e4;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            font-size: 13px;
+        }
+        .visitor-card .visitor-name { font-weight: 700; color: #191c1d; }
+        .visitor-card .visitor-meta { color: #6f7a70; font-size: 11px; margin-top: 4px; line-height: 1.6; }
+        .visitor-card .visitor-stars { color: #f59e0b; font-size: 12px; letter-spacing: 1px; }
+        .visitor-card-new { border-left: 3px solid #217346; }
+        /* Dashboard tabs */
+        .dash-tabs { display: flex; border-bottom: 1px solid #e1e3e4; flex-shrink: 0; }
+        .dash-tab {
+            flex: 1; padding: 10px 8px; text-align: center; font-size: 12px; font-weight: 600;
+            color: #6f7a70; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .dash-tab.active { color: #217346; border-bottom-color: #217346; }
+        .dash-tab:hover:not(.active) { color: #191c1d; }
+        .dash-tab-content { display: none; flex: 1; overflow-y: auto; padding: 12px; }
+        .dash-tab-content.active { display: block; }
+        /* Legend items */
+        .legend-item {
+            padding: 14px 16px; border-radius: 12px; border: 1px solid #e1e3e4;
+            margin-bottom: 8px; background: #f8f9fa;
+        }
+        .legend-icon { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; }
+        .legend-code { font-family: 'Courier New', monospace; font-size: 12px; font-weight: 700; color: #217346; background: #e8f5e9; padding: 2px 8px; border-radius: 6px; }
 
         /* Toast notification */
         .toast {
@@ -539,10 +614,10 @@
         </div>
         <div class="space-y-4">
             <div>
-                <label class="block text-xs font-bold text-secondary mb-1.5 uppercase tracking-wider">Tài khoản</label>
-                <input type="text" id="adminUser" placeholder="Nhập tài khoản"
+                <label class="block text-xs font-bold text-secondary mb-1.5 uppercase tracking-wider">Email</label>
+                <input type="email" id="adminUser" placeholder="Nhập email admin"
                     class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-medium text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-                    autocomplete="off" />
+                    autocomplete="email" />
             </div>
             <div>
                 <label class="block text-xs font-bold text-secondary mb-1.5 uppercase tracking-wider">Mật khẩu</label>
@@ -555,11 +630,23 @@
                     </button>
                 </div>
             </div>
-            <div id="loginError" class="text-xs text-error font-semibold hidden">Sai tài khoản hoặc mật khẩu!</div>
+            <div id="loginError" class="text-xs text-error font-semibold hidden">Sai email hoặc mật khẩu!</div>
             <button id="adminLoginBtn"
-                class="w-full py-3.5 bg-emerald-900 text-white rounded-xl font-headline font-bold text-sm shadow-lg hover:bg-emerald-800 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                class="w-full py-3.5 bg-emerald-900 text-white rounded-xl font-headline font-bold text-sm shadow-lg hover:bg-emerald-800 active:scale-[0.98] transition-all flex items-center justify-center gap-2" disabled>
                 <span class="material-symbols-outlined text-lg">login</span>
-                Đăng nhập
+                <span id="loginBtnText">Đang tải...</span>
+            </button>
+            <!-- Divider -->
+            <div class="flex items-center gap-3">
+                <div class="flex-1 h-px bg-outline-variant/30"></div>
+                <span class="text-[11px] text-secondary font-semibold uppercase tracking-wider">hoặc</span>
+                <div class="flex-1 h-px bg-outline-variant/30"></div>
+            </div>
+            <!-- Google Sign-in -->
+            <button id="googleLoginBtn"
+                class="w-full py-3 bg-white border border-outline-variant/30 text-on-surface rounded-xl font-headline font-bold text-sm hover:bg-surface-container-low active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-sm">
+                <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+                Đăng nhập bằng Google
             </button>
             <button id="adminCloseBtn"
                 class="w-full py-2.5 text-secondary text-sm font-medium hover:text-on-surface transition-colors">
@@ -580,6 +667,12 @@
     <div class="flex items-center gap-2">
         <button class="btn-save" id="btnSave" onclick="saveContent()">
             <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">save</span> Lưu</span>
+        </button>
+        <button class="btn-visitors" id="btnVisitors" onclick="toggleVisitorDashboard()">
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">group</span> Khách (<span id="visitorCount">0</span>)</span>
+        </button>
+        <button class="btn-export" id="btnExport" onclick="exportHTML()">
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">download</span> Tải file</span>
         </button>
         <button class="btn-reset" id="btnReset" onclick="resetContent()">
             <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">restart_alt</span> Mặc định</span>
@@ -637,7 +730,7 @@
 <span class="text-lg font-extrabold tracking-tighter text-white font-headline" data-editable="site-title">Advanced Excel</span>
 </div>
 <div class="w-8 h-8 rounded-full overflow-hidden border border-emerald-500/30">
-<img alt="Instructor" class="w-full h-full object-cover" data-img="header-avatar" src="https://i.pinimg.com/736x/12/fb/8f/12fb8fee3b286d3743dd2efad2e2c590.jpg"/>
+<img alt="Instructor" class="w-full h-full object-cover" data-img="header-avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGcsNcgMoBrWb6Me-HsWdHxeKceqnNo-Gdkv3w8mN8C6LjdhDIm-s-n6RB0g57RTySp3Xho4IwjuVZ5UqmlJJLKHglDNaWFIS4zkMcfHBdwPiso6kbhLGal8ZOckQczRBvGWwF7KR3FG2H7pgKMNa3CTDjOttCxG81Ud8cgKjLNxixKZVu_FcMkfCV772mO0CtlJ1-INrvXlygzIQPafwl3oisK2qDOraDSVnjw_mVLACbK2wbCOceY48sFkcFqhQuhtsYM_ZNkN6d"/>
 </div>
 </header>
 <main class="pt-16 pb-24 cell-grid-bg min-h-screen">
@@ -659,9 +752,9 @@
 </button>
 <div class="flex items-center gap-4 py-2 px-1">
 <div class="flex -space-x-3">
-<img alt="User 1" class="w-8 h-8 rounded-full border-2 border-white object-cover" data-img="user1-avatar" src="https://i-raovat.vnecdn.net/2018/08/24/464fcb337cadf2d097fb24868d32f55c.jpeg?w=600&h=400&q=100&dpr=1&rt=auto&g=no&s=-xFvCCetyQomWdeEvewQVw"/>
-<img alt="User 2" class="w-8 h-8 rounded-full border-2 border-white object-cover" data-img="user2-avatar" src="https://media-cdn-v2.laodong.vn/storage/newsportal/2023/11/19/1269291/Nhan-Vien-Van-Phong-.jpeg"/>
-<img alt="User 3" class="w-8 h-8 rounded-full border-2 border-white object-cover" data-img="user3-avatar" src="https://cdn.tienphong.vn/images/959b752532d93ef19056f74c1b99aec75d68c1d4ae29ce6722d620714ba63c1666411a8e9fe5e970540a7155bff811eb/saori2.jpg"/>
+<img alt="User 1" class="w-8 h-8 rounded-full border-2 border-white object-cover" data-img="user1-avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCC4yVSxAK4Pibst_8QrbQTFEnmVGx1TbIE8RQcgB-2Q7lrYEjMofTThRhrDU4AJ1_VSxEZFRMqafITSA1G4ytYLbqYjPgxLxen-wJdPby5jd_fyYUP_EIRlkLfmBMwAm_4n7zDg0cjhR7XOvZqcAw6rYDZU5m2IrKMBUcn-oo3NPGu7xD7u2mPM4rYpzuhyP_Y-5Ay8LmrPMsDWjaLnsFeHO9OViuODWvV-aJjPo1dwxFzW66lHO-usm_sbDvhwMB9gZc5FYLimwu8"/>
+<img alt="User 2" class="w-8 h-8 rounded-full border-2 border-white object-cover" data-img="user2-avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZnLftPCOrie3O9KMgGqFBZmxU7Y7xSgTbCOSLayYFz4lrIC33lpOQDD-ApwKi4ZK3hkP9WVYA8NPzCMer7Io6mIZ3JhzEgYuJ7a_SnFn5QTso7LCr3X6z7U1SqIZi18Nm-NpwEwaPjvGGBubqVlZLqaCQqXymymELqsGw38JYTVfnhz_Z9f_CN7CXOf5pNCKgTNAw77sYGWQ9gg1JQC5j_as6pcuC3ptT6hGMxgaSbdQE1BPfILk6ZeKiMOUyrADsMFyfwE7dGXtT"/>
+<img alt="User 3" class="w-8 h-8 rounded-full border-2 border-white object-cover" data-img="user3-avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfWvh9z9ytTSVTMfFgS8SACRUMnlSnkVYnbFwo8ZBqzspoXTHOd-YatBRNf1tV_xkEAI5b9w0MPvoVxB0HfV6MMqpoxRiuyW-T02_lNIH-DbpeXg7vmoVQ8cSI_eZiT4-owMCsBUMSpzcineteH1cAfQGPn11iA5obDljsVXA1lVkF98V9uAHZdW-Uf7Kk31uOxO0_4QXBHjvwxOqtCohtc3Bkfmxk7KFQfdBIbeOFFessPawp3XCnzlwK9LmCJizX76-yorIC9XF8"/>
 </div>
 <span class="text-xs font-semibold text-secondary" data-editable="hero-students">+200 Học viên thành công</span>
 </div>
@@ -736,7 +829,7 @@
 <h2 class="font-headline font-bold text-2xl text-on-surface mb-6" data-editable="instructor-section-title">Giảng viên đồng hành</h2>
 <div class="bg-white rounded-3xl overflow-hidden border border-outline-variant/20 shadow-sm">
 <div class="relative h-64 overflow-hidden">
-<img alt="Thầy Trần Công Kiên" class="w-full h-full object-cover object-top" data-img="instructor-photo" src="https://i.pinimg.com/736x/12/fb/8f/12fb8fee3b286d3743dd2efad2e2c590.jpg"/>
+<img alt="Thầy Trần Công Kiên" class="w-full h-full object-cover object-top" data-img="instructor-photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGcsNcgMoBrWb6Me-HsWdHxeKceqnNo-Gdkv3w8mN8C6LjdhDIm-s-n6RB0g57RTySp3Xho4IwjuVZ5UqmlJJLKHglDNaWFIS4zkMcfHBdwPiso6kbhLGal8ZOckQczRBvGWwF7KR3FG2H7pgKMNa3CTDjOttCxG81Ud8cgKjLNxixKZVu_FcMkfCV772mO0CtlJ1-INrvXlygzIQPafwl3oisK2qDOraDSVnjw_mVLACbK2wbCOceY48sFkcFqhQuhtsYM_ZNkN6d"/>
 <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
 <div class="absolute bottom-4 left-6">
 <h3 class="font-headline font-extrabold text-2xl text-white" data-editable="instructor-name">Thầy Trần Công Kiên</h3>
@@ -853,7 +946,7 @@
 <!-- Testimonial 1 -->
 <div class="bg-white p-5 rounded-3xl border border-outline-variant/10 shadow-sm">
 <div class="flex items-center gap-3 mb-4">
-<img alt="Nguyễn Minh Anh" class="w-12 h-12 rounded-full object-cover" data-img="review1-avatar" src="https://media-cdn-v2.laodong.vn/storage/newsportal/2023/11/19/1269291/Nhan-Vien-Van-Phong-.jpeg"/>
+<img alt="Nguyễn Minh Anh" class="w-12 h-12 rounded-full object-cover" data-img="review1-avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZnLftPCOrie3O9KMgGqFBZmxU7Y7xSgTbCOSLayYFz4lrIC33lpOQDD-ApwKi4ZK3hkP9WVYA8NPzCMer7Io6mIZ3JhzEgYuJ7a_SnFn5QTso7LCr3X6z7U1SqIZi18Nm-NpwEwaPjvGGBubqVlZLqaCQqXymymELqsGw38JYTVfnhz_Z9f_CN7CXOf5pNCKgTNAw77sYGWQ9gg1JQC5j_as6pcuC3ptT6hGMxgaSbdQE1BPfILk6ZeKiMOUyrADsMFyfwE7dGXtT"/>
 <div>
 <h4 class="font-headline font-bold text-sm text-on-surface" data-editable="review1-name">Minh Anh</h4>
 <p class="text-[10px] text-secondary font-medium uppercase tracking-wider" data-editable="review1-role">Phó phòng nhân sự</p>
@@ -871,7 +964,7 @@
 <!-- Testimonial 2 -->
 <div class="bg-white p-5 rounded-3xl border border-outline-variant/10 shadow-sm">
 <div class="flex items-center gap-3 mb-4">
-<img alt="Trần Thu Hà" class="w-12 h-12 rounded-full object-cover" data-img="review2-avatar" src="https://i-raovat.vnecdn.net/2018/08/24/464fcb337cadf2d097fb24868d32f55c.jpeg?w=600&h=400&q=100&dpr=1&rt=auto&g=no&s=-xFvCCetyQomWdeEvewQVw"/>
+<img alt="Trần Thu Hà" class="w-12 h-12 rounded-full object-cover" data-img="review2-avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfWvh9z9ytTSVTMfFgS8SACRUMnlSnkVYnbFwo8ZBqzspoXTHOd-YatBRNf1tV_xkEAI5b9w0MPvoVxB0HfV6MMqpoxRiuyW-T02_lNIH-DbpeXg7vmoVQ8cSI_eZiT4-owMCsBUMSpzcineteH1cAfQGPn11iA5obDljsVXA1lVkF98V9uAHZdW-Uf7Kk31uOxO0_4QXBHjvwxOqtCohtc3Bkfmxk7KFQfdBIbeOFFessPawp3XCnzlwK9LmCJizX76-yorIC9XF8"/>
 <div>
 <h4 class="font-headline font-bold text-sm text-on-surface" data-editable="review2-name">Trần Thu Hà</h4>
 <p class="text-[10px] text-secondary font-medium uppercase tracking-wider" data-editable="review2-role">Chuyên viên Nhân sự</p>
@@ -884,12 +977,12 @@
 <span class="material-symbols-outlined text-amber-400 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
 </div>
 </div>
-<p class="text-sm text-on-surface-variant leading-relaxed" data-editable="review2-text">"Phương pháp thực chiến của thầy Kiên cực kỳ dễ hiểu. Nhờ các kỹ năng Excel nâng cao mà tôi đã được thăng chức lên vị trí quản lý sau 3 tháng."</p>
+<p class="text-sm text-on-surface-variant leading-relaxed" data-editable="review2-text">"Phương pháp thực chiến của thầy Nam cực kỳ dễ hiểu. Nhờ các kỹ năng Excel nâng cao mà tôi đã được thăng chức lên vị trí quản lý sau 3 tháng."</p>
 </div>
 <!-- Testimonial 3 -->
 <div class="bg-white p-5 rounded-3xl border border-outline-variant/10 shadow-sm">
 <div class="flex items-center gap-3 mb-4">
-<img alt="Lê Thu Trang" class="w-12 h-12 rounded-full object-cover" data-img="review3-avatar" src="https://cdn.tienphong.vn/images/959b752532d93ef19056f74c1b99aec75d68c1d4ae29ce6722d620714ba63c1666411a8e9fe5e970540a7155bff811eb/saori2.jpg"/>
+<img alt="Lê Thu Trang" class="w-12 h-12 rounded-full object-cover" data-img="review3-avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCC4yVSxAK4Pibst_8QrbQTFEnmVGx1TbIE8RQcgB-2Q7lrYEjMofTThRhrDU4AJ1_VSxEZFRMqafITSA1G4ytYLbqYjPgxLxen-wJdPby5jd_fyYUP_EIRlkLfmBMwAm_4n7zDg0cjhR7XOvZqcAw6rYDZU5m2IrKMBUcn-oo3NPGu7xD7u2mPM4rYpzuhyP_Y-5Ay8LmrPMsDWjaLnsFeHO9OViuODWvV-aJjPo1dwxFzW66lHO-usm_sbDvhwMB9gZc5FYLimwu8"/>
 <div>
 <h4 class="font-headline font-bold text-sm text-on-surface" data-editable="review3-name">Lê Thu Trang</h4>
 <p class="text-[10px] text-secondary font-medium uppercase tracking-wider" data-editable="review3-role">Phân tích dữ liệu</p>
@@ -922,27 +1015,27 @@
     <!-- Gallery Item 1 -->
     <div class="gallery-item" data-gallery-idx="0" style="position:relative;">
         <button class="gallery-delete-btn" onclick="deleteGalleryItem(0)"><span class="material-symbols-outlined">close</span></button>
-        <img class="gallery-item-img" data-img="gallery-0" src="https://i.pinimg.com/736x/7b/4b/3a/7b4b3a44038de6757d86c1ef9f399545.jpg" alt="Dashboard học viên"/>
+        <img class="gallery-item-img" data-img="gallery-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCC4yVSxAK4Pibst_8QrbQTFEnmVGx1TbIE8RQcgB-2Q7lrYEjMofTThRhrDU4AJ1_VSxEZFRMqafITSA1G4ytYLbqYjPgxLxen-wJdPby5jd_fyYUP_EIRlkLfmBMwAm_4n7zDg0cjhR7XOvZqcAw6rYDZU5m2IrKMBUcn-oo3NPGu7xD7u2mPM4rYpzuhyP_Y-5Ay8LmrPMsDWjaLnsFeHO9OViuODWvV-aJjPo1dwxFzW66lHO-usm_sbDvhwMB9gZc5FYLimwu8" alt="Dashboard học viên"/>
         <div class="gallery-item-body">
-            <h4 class="font-headline font-bold text-sm text-on-surface" data-editable="gallery-0-name">Minh Anh</h4>
+            <h4 class="font-headline font-bold text-sm text-on-surface" data-editable="gallery-0-name">Nguyễn Văn A</h4>
             <p class="text-[11px] text-secondary mt-0.5" data-editable="gallery-0-desc">Dashboard phân tích doanh thu theo quý</p>
         </div>
     </div>
     <!-- Gallery Item 2 -->
     <div class="gallery-item" data-gallery-idx="1" style="position:relative;">
         <button class="gallery-delete-btn" onclick="deleteGalleryItem(1)"><span class="material-symbols-outlined">close</span></button>
-        <img class="gallery-item-img" data-img="gallery-1" src="https://i.pinimg.com/736x/a3/76/d6/a376d687be2bfe57aaaf6c5c8bcc444b.jpg" alt="Dashboard học viên"/>
+        <img class="gallery-item-img" data-img="gallery-1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZnLftPCOrie3O9KMgGqFBZmxU7Y7xSgTbCOSLayYFz4lrIC33lpOQDD-ApwKi4ZK3hkP9WVYA8NPzCMer7Io6mIZ3JhzEgYuJ7a_SnFn5QTso7LCr3X6z7U1SqIZi18Nm-NpwEwaPjvGGBubqVlZLqaCQqXymymELqsGw38JYTVfnhz_Z9f_CN7CXOf5pNCKgTNAw77sYGWQ9gg1JQC5j_as6pcuC3ptT6hGMxgaSbdQE1BPfILk6ZeKiMOUyrADsMFyfwE7dGXtT" alt="Dashboard học viên"/>
         <div class="gallery-item-body">
-            <h4 class="font-headline font-bold text-sm text-on-surface" data-editable="gallery-1-name">Trần Thu Hà</h4>
+            <h4 class="font-headline font-bold text-sm text-on-surface" data-editable="gallery-1-name">Trần Thị B</h4>
             <p class="text-[11px] text-secondary mt-0.5" data-editable="gallery-1-desc">Báo cáo nhân sự tự động hóa</p>
         </div>
     </div>
     <!-- Gallery Item 3 -->
     <div class="gallery-item" data-gallery-idx="2" style="position:relative;">
         <button class="gallery-delete-btn" onclick="deleteGalleryItem(2)"><span class="material-symbols-outlined">close</span></button>
-        <img class="gallery-item-img" data-img="gallery-2" src="https://i.pinimg.com/736x/bd/2d/1e/bd2d1e436c1fdbf07cd89555640142eb.jpg" alt="Dashboard học viên"/>
+        <img class="gallery-item-img" data-img="gallery-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfWvh9z9ytTSVTMfFgS8SACRUMnlSnkVYnbFwo8ZBqzspoXTHOd-YatBRNf1tV_xkEAI5b9w0MPvoVxB0HfV6MMqpoxRiuyW-T02_lNIH-DbpeXg7vmoVQ8cSI_eZiT4-owMCsBUMSpzcineteH1cAfQGPn11iA5obDljsVXA1lVkF98V9uAHZdW-Uf7Kk31uOxO0_4QXBHjvwxOqtCohtc3Bkfmxk7KFQfdBIbeOFFessPawp3XCnzlwK9LmCJizX76-yorIC9XF8" alt="Dashboard học viên"/>
         <div class="gallery-item-body">
-            <h4 class="font-headline font-bold text-sm text-on-surface" data-editable="gallery-2-name">Lê Thu Trang</h4>
+            <h4 class="font-headline font-bold text-sm text-on-surface" data-editable="gallery-2-name">Lê Minh C</h4>
             <p class="text-[11px] text-secondary mt-0.5" data-editable="gallery-2-desc">Dashboard KPI theo phòng ban</p>
         </div>
     </div>
@@ -1025,6 +1118,108 @@
 </button>
 </div>
 
+<!-- Visitor Dashboard (Admin only) -->
+<div class="visitor-dashboard" id="visitorDashboard">
+    <div class="visitor-dashboard-header">
+        <div>
+            <h3 class="font-headline font-extrabold text-base text-on-surface">Quản lý khách</h3>
+            <p class="text-[11px] text-secondary mt-0.5">Tracking & phân tích hành vi</p>
+        </div>
+        <button onclick="toggleVisitorDashboard()" class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center hover:bg-surface-container-high transition-colors">
+            <span class="material-symbols-outlined text-lg text-secondary">close</span>
+        </button>
+    </div>
+    <!-- Tabs -->
+    <div class="dash-tabs">
+        <div class="dash-tab active" onclick="switchDashTab('visitors')">👥 Khách (<span id="visitorCount">0</span>)</div>
+        <div class="dash-tab" onclick="switchDashTab('legend')">📖 Chú giải tracking</div>
+    </div>
+    <!-- Tab: Visitors -->
+    <div class="dash-tab-content active" id="tabVisitors">
+        <div id="visitorList">
+            <p class="text-center text-sm text-secondary py-8">Đang tải...</p>
+        </div>
+    </div>
+    <!-- Tab: Legend -->
+    <div class="dash-tab-content" id="tabLegend">
+        <p style="font-size:12px;color:#6f7a70;margin-bottom:12px;line-height:1.6;">Định nghĩa các sự kiện đang được theo dõi trên website. Dữ liệu lưu trên Firestore, collection <span class="legend-code">visitors</span>.</p>
+
+        <div class="legend-item">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+                <div class="legend-icon" style="background:#e8f5e9;color:#217346;">👁</div>
+                <div>
+                    <div style="font-weight:700;font-size:13px;color:#191c1d;">page_view</div>
+                    <div style="font-size:11px;color:#6f7a70;">Xem trang</div>
+                </div>
+            </div>
+            <p style="font-size:11px;color:#6f7a70;line-height:1.5;margin:0;">Ghi nhận mỗi lần người dùng mở hoặc tải lại trang web. Đếm số lần truy cập.</p>
+        </div>
+
+        <div class="legend-item">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+                <div class="legend-icon" style="background:#ede9fe;color:#7c3aed;">📋</div>
+                <div>
+                    <div style="font-weight:700;font-size:13px;color:#191c1d;">open_popup</div>
+                    <div style="font-size:11px;color:#6f7a70;">Mở popup đăng ký</div>
+                </div>
+            </div>
+            <p style="font-size:11px;color:#6f7a70;line-height:1.5;margin:0;">Khi nhấn bất kỳ nút "Đăng ký ngay", "Đăng ký" hoặc nút chat. Cho thấy mức độ quan tâm.</p>
+        </div>
+
+        <div class="legend-item">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+                <div class="legend-icon" style="background:#fef3c7;color:#d97706;">⭐</div>
+                <div>
+                    <div style="font-weight:700;font-size:13px;color:#191c1d;">rate_stars</div>
+                    <div style="font-size:11px;color:#6f7a70;">Đánh giá sao</div>
+                </div>
+            </div>
+            <p style="font-size:11px;color:#6f7a70;line-height:1.5;margin:0;">Người dùng đánh giá mức độ quan tâm (1-5 sao) trong popup. Lưu kèm số sao cụ thể.</p>
+        </div>
+
+        <div class="legend-item">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+                <div class="legend-icon" style="background:#dbeafe;color:#0068ff;">💬</div>
+                <div>
+                    <div style="font-weight:700;font-size:13px;color:#191c1d;">click_zalo</div>
+                    <div style="font-size:11px;color:#6f7a70;">Bấm nút Zalo</div>
+                </div>
+            </div>
+            <p style="font-size:11px;color:#6f7a70;line-height:1.5;margin:0;">Nhấn nút "Liên hệ Zalo giảng viên" xanh lớn trong popup. Đây là hành vi chuyển đổi quan trọng nhất.</p>
+        </div>
+
+        <div class="legend-item">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+                <div class="legend-icon" style="background:#dbeafe;color:#0068ff;">📞</div>
+                <div>
+                    <div style="font-weight:700;font-size:13px;color:#191c1d;">click_zalo_phone</div>
+                    <div style="font-size:11px;color:#6f7a70;">Bấm SĐT Zalo</div>
+                </div>
+            </div>
+            <p style="font-size:11px;color:#6f7a70;line-height:1.5;margin:0;">Nhấn vào số điện thoại hoặc icon chat bên cạnh số. Cũng dẫn tới Zalo giảng viên.</p>
+        </div>
+
+        <div style="margin-top:16px;padding:12px 14px;border-radius:12px;background:#f0fdf4;border:1px dashed #86efac;">
+            <p style="font-size:12px;font-weight:700;color:#217346;margin:0 0 6px;">Cách đọc dữ liệu khách</p>
+            <p style="font-size:11px;color:#4b5563;line-height:1.6;margin:0;">
+                • <b style="font-weight:600;">Khách "nóng"</b> (viền xanh): đã bấm Zalo → khả năng chuyển đổi cao<br>
+                • <b style="font-weight:600;">Xem nhiều + mở popup</b> nhưng chưa Zalo → đang cân nhắc<br>
+                • <b style="font-weight:600;">Chỉ xem trang</b> → mới tìm hiểu, chưa quan tâm sâu<br>
+                • <b style="font-weight:600;">5 sao</b> → rất quan tâm, nên ưu tiên chăm sóc
+            </p>
+        </div>
+
+        <div style="margin-top:12px;padding:12px 14px;border-radius:12px;background:#eff6ff;border:1px dashed #93c5fd;">
+            <p style="font-size:12px;font-weight:700;color:#1d4ed8;margin:0 0 6px;">Thêm tracking mới</p>
+            <p style="font-size:11px;color:#4b5563;line-height:1.6;margin:0;">
+                Muốn tracking thêm hành vi mới? Chỉ cần gọi hàm:<br>
+                <span class="legend-code">trackEvent('tên_sự_kiện')</span><br>
+                Dữ liệu sẽ tự động lưu vào Firestore và hiện trên dashboard.
+            </p>
+        </div>
+    </div>
+</div>
+
 <!-- CTA Popup -->
 <div class="cta-popup-overlay" id="ctaPopup">
     <div class="cta-popup-box">
@@ -1063,7 +1258,7 @@
         <!-- Instructor contact card -->
         <div class="instructor-contact-card">
             <img class="instructor-contact-avatar" data-img="cta-instructor-avatar" id="ctaInstructorAvatar"
-                src="https://i.pinimg.com/736x/12/fb/8f/12fb8fee3b286d3743dd2efad2e2c590.jpg"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGcsNcgMoBrWb6Me-HsWdHxeKceqnNo-Gdkv3w8mN8C6LjdhDIm-s-n6RB0g57RTySp3Xho4IwjuVZ5UqmlJJLKHglDNaWFIS4zkMcfHBdwPiso6kbhLGal8ZOckQczRBvGWwF7KR3FG2H7pgKMNa3CTDjOttCxG81Ud8cgKjLNxixKZVu_FcMkfCV772mO0CtlJ1-INrvXlygzIQPafwl3oisK2qDOraDSVnjw_mVLACbK2wbCOceY48sFkcFqhQuhtsYM_ZNkN6d"
                 alt="Giảng viên"/>
             <div class="flex-1 min-w-0">
                 <p class="font-headline font-bold text-sm text-on-surface" data-editable="cta-popup-instructor-name">Thầy Trần Công Kiên</p>
@@ -1079,26 +1274,38 @@
     </div>
 </div>
 
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 // ============================================
-// ADMIN SYSTEM - Hidden Login & Content Editor
+// ADMIN SYSTEM - Firebase Auth + Firestore
 // ============================================
 
-// === CONFIGURATION ===
-const ADMIN_CREDENTIALS = {
-    username: 'admin',
-    password: 'excel2024'
+// === FIREBASE CONFIG ===
+const firebaseConfig = {
+    apiKey: "AIzaSyBkMdlTJt9hkK8_dO2Z1dsRVP3heLeQcCM",
+    authDomain: "excelweb-51f44.firebaseapp.com",
+    projectId: "excelweb-51f44",
+    storageBucket: "excelweb-51f44.firebasestorage.app",
+    messagingSenderId: "1027910251506",
+    appId: "1:1027910251506:web:03f8e46644ddd8e414316b"
 };
 
-const STORAGE_KEY = 'admin_content_data';
-const IMG_STORAGE_KEY = 'admin_image_data';
-const SESSION_KEY = 'admin_logged_in';
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const CONTENT_DOC = db.collection('siteContent').doc('main');
+const IMAGES_DOC = db.collection('siteContent').doc('images');
+const GALLERY_DOC = db.collection('siteContent').doc('gallery');
 
 // === STATE ===
 let isAdminMode = false;
 let clickCount = 0;
 let clickTimer = null;
-let currentEditingImg = null; // currently editing image element
+let currentEditingImg = null;
 
 // === ELEMENTS ===
 const adminTrigger = document.getElementById('adminTrigger');
@@ -1114,8 +1321,35 @@ const imgEditModal = document.getElementById('imgEditModal');
 const imgUrlInput = document.getElementById('imgUrlInput');
 const imgPreview = document.getElementById('imgPreview');
 const imgFileInput = document.getElementById('imgFileInput');
+const loginBtn = document.getElementById('adminLoginBtn');
+const loginBtnText = document.getElementById('loginBtnText');
 
-// === HIDDEN TRIGGER: Triple-click bottom-left corner ===
+// === ADMIN WHITELIST ===
+const ADMIN_EMAILS = ['ongchuexcel@gmail.com'];
+
+function isAllowedAdmin(email) {
+    return ADMIN_EMAILS.includes(email.toLowerCase());
+}
+
+// === FIREBASE AUTH STATE ===
+auth.onAuthStateChanged(async function(user) {
+    loginBtn.disabled = false;
+    loginBtnText.textContent = 'Đăng nhập';
+    if (user) {
+        if (isAllowedAdmin(user.email)) {
+            enterAdminMode();
+            loadContentFromFirestore();
+            // Load visitor count
+            VISITORS_COLLECTION.get().then(snap => { document.getElementById('visitorCount').textContent = snap.size; }).catch(() => {});
+        } else {
+            // Not authorized — sign out immediately
+            await auth.signOut();
+            showToast('Tài khoản ' + user.email + ' không có quyền admin!', 'error');
+        }
+    }
+});
+
+// === HIDDEN TRIGGER ===
 adminTrigger.addEventListener('click', function(e) {
     clickCount++;
     if (clickCount === 1) {
@@ -1128,15 +1362,11 @@ adminTrigger.addEventListener('click', function(e) {
     }
 });
 
-// Keyboard shortcut: Ctrl+Shift+L
 document.addEventListener('keydown', function(e) {
     if (e.ctrlKey && e.shiftKey && e.key === 'L') {
         e.preventDefault();
-        if (isAdminMode) {
-            logoutAdmin();
-        } else {
-            openLoginModal();
-        }
+        if (isAdminMode) logoutAdmin();
+        else openLoginModal();
     }
 });
 
@@ -1158,7 +1388,6 @@ adminOverlay.addEventListener('click', function(e) {
     if (e.target === adminOverlay) closeLoginModal();
 });
 
-// Toggle password visibility
 document.getElementById('togglePassBtn').addEventListener('click', function() {
     const passInput = document.getElementById('adminPass');
     const icon = document.getElementById('togglePassIcon');
@@ -1171,25 +1400,57 @@ document.getElementById('togglePassBtn').addEventListener('click', function() {
     }
 });
 
-// Login action
-document.getElementById('adminLoginBtn').addEventListener('click', attemptLogin);
+loginBtn.addEventListener('click', attemptLogin);
 adminPass.addEventListener('keydown', function(e) { if (e.key === 'Enter') attemptLogin(); });
 adminUser.addEventListener('keydown', function(e) { if (e.key === 'Enter') adminPass.focus(); });
 
-function attemptLogin() {
-    const user = adminUser.value.trim();
+async function attemptLogin() {
+    const email = adminUser.value.trim();
     const pass = adminPass.value.trim();
-    if (user === ADMIN_CREDENTIALS.username && pass === ADMIN_CREDENTIALS.password) {
+    if (!email || !pass) {
+        loginError.textContent = 'Vui lòng nhập email và mật khẩu!';
+        loginError.classList.remove('hidden');
+        return;
+    }
+    loginBtn.disabled = true;
+    loginBtnText.textContent = 'Đang đăng nhập...';
+    loginError.classList.add('hidden');
+    try {
+        await auth.signInWithEmailAndPassword(email, pass);
         closeLoginModal();
-        enterAdminMode();
-        sessionStorage.setItem(SESSION_KEY, 'true');
         showToast('Đăng nhập thành công! Nhấp vào nội dung hoặc ảnh để chỉnh sửa.', 'success');
-    } else {
+    } catch(error) {
+        let msg = 'Sai email hoặc mật khẩu!';
+        if (error.code === 'auth/invalid-email') msg = 'Email không hợp lệ!';
+        else if (error.code === 'auth/user-not-found') msg = 'Email không tồn tại!';
+        else if (error.code === 'auth/wrong-password') msg = 'Sai mật khẩu!';
+        else if (error.code === 'auth/too-many-requests') msg = 'Quá nhiều lần thử. Vui lòng đợi.';
+        loginError.textContent = msg;
         loginError.classList.remove('hidden');
         adminLoginBox.classList.add('shake');
         setTimeout(() => adminLoginBox.classList.remove('shake'), 500);
+    } finally {
+        loginBtn.disabled = false;
+        loginBtnText.textContent = 'Đăng nhập';
     }
 }
+
+// === GOOGLE SIGN-IN ===
+const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+document.getElementById('googleLoginBtn').addEventListener('click', async function() {
+    loginError.classList.add('hidden');
+    try {
+        await auth.signInWithPopup(googleProvider);
+        closeLoginModal();
+        showToast('Đăng nhập Google thành công!', 'success');
+    } catch(error) {
+        if (error.code === 'auth/popup-closed-by-user') return;
+        if (error.code === 'auth/cancelled-popup-request') return;
+        loginError.textContent = 'Lỗi đăng nhập Google: ' + (error.message || error.code);
+        loginError.classList.remove('hidden');
+    }
+});
 
 // === ADMIN MODE ===
 function enterAdminMode() {
@@ -1198,26 +1459,15 @@ function enterAdminMode() {
     adminToolbar.classList.add('active');
     mainHeader.style.top = '46px';
     document.querySelector('main').style.paddingTop = 'calc(4rem + 46px)';
-
-    // Make text editable
     document.querySelectorAll('[data-editable]').forEach(el => {
         el.classList.add('admin-editable');
         el.setAttribute('contenteditable', 'true');
         el.setAttribute('spellcheck', 'false');
     });
-
-    // Make images clickable to edit
     setupImageEditing();
-
-    // Enable gallery item image clicks & editable fields
     document.querySelectorAll('.gallery-item [data-img]').forEach(img => {
         img.style.cursor = 'pointer';
-        img.onclick = function(e) {
-            if (!isAdminMode) return;
-            e.preventDefault();
-            e.stopPropagation();
-            openImageEditModal(img);
-        };
+        img.onclick = function(e) { if (!isAdminMode) return; e.preventDefault(); e.stopPropagation(); openImageEditModal(img); };
     });
     document.querySelectorAll('.gallery-item [data-editable]').forEach(el => {
         el.classList.add('admin-editable');
@@ -1232,45 +1482,23 @@ function exitAdminMode() {
     adminToolbar.classList.remove('active');
     mainHeader.style.top = '0';
     document.querySelector('main').style.paddingTop = '4rem';
-
-    document.querySelectorAll('[data-editable]').forEach(el => {
-        el.classList.remove('admin-editable');
-        el.removeAttribute('contenteditable');
-    });
-
-    // Remove image edit badges and admin click-through
+    document.querySelectorAll('[data-editable]').forEach(el => { el.classList.remove('admin-editable'); el.removeAttribute('contenteditable'); });
     document.querySelectorAll('.img-edit-badge').forEach(b => b.remove());
     document.querySelectorAll('.admin-click-through').forEach(el => el.classList.remove('admin-click-through'));
     document.querySelectorAll('.img-edit-badge-container').forEach(el => el.classList.remove('img-edit-badge-container'));
-    document.querySelectorAll('[data-img]').forEach(img => {
-        img.style.cursor = '';
-        img.style.zIndex = '';
-        img.style.position = '';
-        img.onclick = null;
-    });
+    document.querySelectorAll('[data-img]').forEach(img => { img.style.cursor = ''; img.style.zIndex = ''; img.style.position = ''; img.onclick = null; });
 }
 
 // === IMAGE EDITING ===
 function setupImageEditing() {
     document.querySelectorAll('[data-img]').forEach(img => {
-        // Find the positioning parent
         const parent = img.parentElement;
-        if (getComputedStyle(parent).position === 'static') {
-            parent.style.position = 'relative';
-        }
-
-        // Make sibling overlay divs click-through in admin mode
-        // (fixes gradient overlay blocking instructor photo click)
+        if (getComputedStyle(parent).position === 'static') parent.style.position = 'relative';
         Array.from(parent.children).forEach(sibling => {
-            if (sibling !== img && sibling.tagName !== 'DIV') return;
             if (sibling === img) return;
             const pos = getComputedStyle(sibling).position;
-            if (pos === 'absolute' || pos === 'fixed') {
-                sibling.classList.add('admin-click-through');
-            }
+            if (pos === 'absolute' || pos === 'fixed') sibling.classList.add('admin-click-through');
         });
-
-        // Add edit badge on the container level
         parent.classList.add('img-edit-badge-container');
         if (!parent.querySelector('.img-edit-badge')) {
             const badge = document.createElement('div');
@@ -1278,188 +1506,239 @@ function setupImageEditing() {
             badge.innerHTML = '<span class="material-symbols-outlined">photo_camera</span>';
             badge.style.zIndex = '50';
             parent.appendChild(badge);
-
-            // Badge click also triggers edit
-            badge.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                openImageEditModal(img);
-            });
+            badge.addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); openImageEditModal(img); });
         }
-
-        // Make the image itself higher z-index and clickable
-        img.style.position = 'relative';
-        img.style.zIndex = '5';
-        img.style.cursor = 'pointer';
-
-        // Click handler on image
-        img.onclick = function(e) {
-            if (!isAdminMode) return;
-            e.preventDefault();
-            e.stopPropagation();
-            openImageEditModal(img);
-        };
-
-        // Also allow clicking the parent container area
+        img.style.position = 'relative'; img.style.zIndex = '5'; img.style.cursor = 'pointer';
+        img.onclick = function(e) { if (!isAdminMode) return; e.preventDefault(); e.stopPropagation(); openImageEditModal(img); };
         parent.addEventListener('click', function(e) {
             if (!isAdminMode) return;
-            // Only if the click target is the parent or an overlay div (not other interactive elements)
-            if (e.target === parent || e.target.classList.contains('admin-click-through')) {
-                e.preventDefault();
-                e.stopPropagation();
-                openImageEditModal(img);
-            }
+            if (e.target === parent || e.target.classList.contains('admin-click-through')) { e.preventDefault(); e.stopPropagation(); openImageEditModal(img); }
         });
     });
 }
 
 function openImageEditModal(imgEl) {
-    currentEditingImg = imgEl;
-    imgUrlInput.value = '';
-    imgPreview.src = imgEl.src;
-    imgPreview.style.display = 'block';
-    imgEditModal.classList.add('active');
-    setTimeout(() => imgUrlInput.focus(), 300);
+    currentEditingImg = imgEl; imgUrlInput.value = ''; imgPreview.src = imgEl.src; imgPreview.style.display = 'block';
+    imgEditModal.classList.add('active'); setTimeout(() => imgUrlInput.focus(), 300);
 }
+function closeImageEditModal() { imgEditModal.classList.remove('active'); currentEditingImg = null; imgUrlInput.value = ''; }
 
-function closeImageEditModal() {
-    imgEditModal.classList.remove('active');
-    currentEditingImg = null;
-    imgUrlInput.value = '';
-}
-
-// URL input - live preview
-imgUrlInput.addEventListener('input', function() {
-    const url = imgUrlInput.value.trim();
-    if (url) {
-        imgPreview.src = url;
-        imgPreview.style.display = 'block';
-    }
-});
-
-// Upload button
-document.getElementById('imgUploadBtn').addEventListener('click', function() {
-    imgFileInput.click();
-});
-
-// File selected
+imgUrlInput.addEventListener('input', function() { const url = imgUrlInput.value.trim(); if (url) { imgPreview.src = url; imgPreview.style.display = 'block'; } });
+document.getElementById('imgUploadBtn').addEventListener('click', function() { imgFileInput.click(); });
 imgFileInput.addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-        showToast('Vui lòng chọn file ảnh!', 'error');
-        return;
-    }
-    // Check file size (max 2MB for localStorage)
-    if (file.size > 2 * 1024 * 1024) {
-        showToast('Ảnh quá lớn! Tối đa 2MB.', 'error');
-        return;
-    }
+    const file = e.target.files[0]; if (!file) return;
+    if (!file.type.startsWith('image/')) { showToast('Vui lòng chọn file ảnh!', 'error'); return; }
+    if (file.size > 2 * 1024 * 1024) { showToast('Ảnh quá lớn! Tối đa 2MB.', 'error'); return; }
     const reader = new FileReader();
-    reader.onload = function(ev) {
-        const dataUrl = ev.target.result;
-        imgUrlInput.value = dataUrl.substring(0, 50) + '... (file uploaded)';
-        imgUrlInput.dataset.fileData = dataUrl;
-        imgPreview.src = dataUrl;
-        imgPreview.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-    // Reset input so same file can be selected again
-    imgFileInput.value = '';
+    reader.onload = function(ev) { const d = ev.target.result; imgUrlInput.value = d.substring(0,50) + '... (uploaded)'; imgUrlInput.dataset.fileData = d; imgPreview.src = d; imgPreview.style.display = 'block'; };
+    reader.readAsDataURL(file); imgFileInput.value = '';
 });
-
-// Save image
 document.getElementById('imgSaveBtn').addEventListener('click', function() {
     if (!currentEditingImg) return;
-    let newSrc = '';
-
-    // Check if file was uploaded
-    if (imgUrlInput.dataset.fileData) {
-        newSrc = imgUrlInput.dataset.fileData;
-        delete imgUrlInput.dataset.fileData;
-    } else {
-        newSrc = imgUrlInput.value.trim();
-    }
-
-    if (!newSrc) {
-        showToast('Vui lòng nhập URL hoặc tải ảnh lên!', 'error');
-        return;
-    }
-
-    currentEditingImg.src = newSrc;
-    closeImageEditModal();
-    showToast('Đã thay đổi hình ảnh! Nhấn "Lưu" để giữ thay đổi.', 'success');
+    let newSrc = imgUrlInput.dataset.fileData || imgUrlInput.value.trim();
+    if (imgUrlInput.dataset.fileData) delete imgUrlInput.dataset.fileData;
+    if (!newSrc) { showToast('Vui lòng nhập URL hoặc tải ảnh lên!', 'error'); return; }
+    currentEditingImg.src = newSrc; closeImageEditModal();
+    showToast('Đã thay đổi hình ảnh! Nhấn "Lưu" để đồng bộ lên Firebase.', 'success');
 });
-
-// Cancel image edit
 document.getElementById('imgCancelBtn').addEventListener('click', closeImageEditModal);
-imgEditModal.addEventListener('click', function(e) {
-    if (e.target === imgEditModal) closeImageEditModal();
-});
+imgEditModal.addEventListener('click', function(e) { if (e.target === imgEditModal) closeImageEditModal(); });
 
-// === SAVE / LOAD / RESET ===
-function saveContent() {
-    // Save text content
-    const textData = {};
-    document.querySelectorAll('[data-editable]').forEach(el => {
-        textData[el.getAttribute('data-editable')] = el.innerHTML;
-    });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(textData));
+// === FIRESTORE SAVE / LOAD ===
+async function saveContent() {
+    showToast('Đang lưu lên Firebase...', 'info');
+    try {
+        const textData = {};
+        document.querySelectorAll('[data-editable]').forEach(el => { textData[el.getAttribute('data-editable')] = el.innerHTML; });
+        await CONTENT_DOC.set(textData);
 
-    // Save image sources
-    const imgData = {};
-    document.querySelectorAll('[data-img]').forEach(img => {
-        // Skip gallery images (saved separately)
-        if (img.getAttribute('data-img').startsWith('gallery-')) return;
-        imgData[img.getAttribute('data-img')] = img.src;
-    });
-    localStorage.setItem(IMG_STORAGE_KEY, JSON.stringify(imgData));
+        const imgData = {};
+        document.querySelectorAll('[data-img]').forEach(img => {
+            if (img.getAttribute('data-img').startsWith('gallery-')) return;
+            const src = img.src;
+            if (src.length < 1048487) imgData[img.getAttribute('data-img')] = src;
+        });
+        await IMAGES_DOC.set(imgData);
 
-    // Save gallery data
-    saveGalleryData();
-
-    showToast('Đã lưu tất cả thay đổi!', 'success');
+        await saveGalleryToFirestore();
+        showToast('Đã lưu lên Firebase thành công!', 'success');
+    } catch(error) { console.error('Firebase save error:', error); showToast('Lỗi khi lưu: ' + error.message, 'error'); }
 }
 
-function loadContent() {
-    // Load text
-    const savedText = localStorage.getItem(STORAGE_KEY);
-    if (savedText) {
-        try {
-            const data = JSON.parse(savedText);
-            Object.keys(data).forEach(key => {
-                const el = document.querySelector(`[data-editable="${key}"]`);
-                if (el) el.innerHTML = data[key];
-            });
-        } catch(e) { console.error('Error loading text:', e); }
-    }
+async function loadContentFromFirestore() {
+    try {
+        const textSnap = await CONTENT_DOC.get();
+        if (textSnap.exists) { const d = textSnap.data(); Object.keys(d).forEach(k => { const el = document.querySelector('[data-editable="'+k+'"]'); if (el) el.innerHTML = d[k]; }); }
+        const imgSnap = await IMAGES_DOC.get();
+        if (imgSnap.exists) { const d = imgSnap.data(); Object.keys(d).forEach(k => { const img = document.querySelector('[data-img="'+k+'"]'); if (img) img.src = d[k]; }); }
+        await loadGalleryFromFirestore();
+    } catch(error) { console.error('Firebase load error:', error); }
+}
 
-    // Load images
-    const savedImg = localStorage.getItem(IMG_STORAGE_KEY);
-    if (savedImg) {
-        try {
-            const data = JSON.parse(savedImg);
-            Object.keys(data).forEach(key => {
-                const img = document.querySelector(`[data-img="${key}"]`);
-                if (img) img.src = data[key];
-            });
-        } catch(e) { console.error('Error loading images:', e); }
+async function loadContentForVisitors() {
+    try {
+        const textSnap = await CONTENT_DOC.get();
+        if (textSnap.exists) { const d = textSnap.data(); Object.keys(d).forEach(k => { const el = document.querySelector('[data-editable="'+k+'"]'); if (el) el.innerHTML = d[k]; }); }
+        const imgSnap = await IMAGES_DOC.get();
+        if (imgSnap.exists) { const d = imgSnap.data(); Object.keys(d).forEach(k => { const img = document.querySelector('[data-img="'+k+'"]'); if (img) img.src = d[k]; }); }
+        await loadGalleryFromFirestore();
+    } catch(error) { console.error('Visitor load error:', error); }
+}
+
+async function resetContent() {
+    if (!confirm('Bạn có chắc muốn khôi phục nội dung mặc định? Dữ liệu trên Firebase sẽ bị xóa.')) return;
+    try { await CONTENT_DOC.delete(); await IMAGES_DOC.delete(); await GALLERY_DOC.delete(); showToast('Đã xóa. Đang tải lại...', 'info'); location.reload(); }
+    catch(error) { showToast('Lỗi: ' + error.message, 'error'); }
+}
+
+async function logoutAdmin() {
+    try { await auth.signOut(); exitAdminMode(); showToast('Đã đăng xuất.', 'info'); }
+    catch(error) { showToast('Lỗi đăng xuất: ' + error.message, 'error'); }
+}
+
+// === EXPORT HTML ===
+function exportHTML() {
+    const wasAdmin = isAdminMode; if (wasAdmin) exitAdminMode();
+    const clone = document.documentElement.cloneNode(true);
+    ['#adminTrigger','#adminOverlay','#adminToolbar','#imgEditModal','#imgFileInput','#toast','.img-edit-badge','.gallery-add-btn','.gallery-delete-btn'].forEach(s => { clone.querySelectorAll(s).forEach(el => el.remove()); });
+    clone.querySelectorAll('.admin-click-through').forEach(el => el.classList.remove('admin-click-through'));
+    clone.querySelectorAll('.img-edit-badge-container').forEach(el => el.classList.remove('img-edit-badge-container'));
+    clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+    clone.querySelectorAll('.admin-editable').forEach(el => el.classList.remove('admin-editable'));
+    clone.querySelectorAll('script:not(#tailwind-config)').forEach(s => { if (!s.src && s.id !== 'tailwind-config') s.remove(); });
+    clone.querySelectorAll('script[src*="gstatic.com/firebasejs"]').forEach(s => s.remove());
+    const blob = new Blob(['<!DOCTYPE html>\n' + clone.outerHTML], { type: 'text/html; charset=utf-8' });
+    const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'index.html';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    if (wasAdmin) enterAdminMode(); showToast('Đã tải file HTML!', 'success');
+}
+
+// === VISITOR TRACKING ===
+const VISITORS_COLLECTION = db.collection('visitors');
+
+function getVisitorId() {
+    let vid = document.cookie.split('; ').find(c => c.startsWith('vid='));
+    if (vid) return vid.split('=')[1];
+    vid = sessionStorage.getItem('visitor_id');
+    if (!vid) {
+        vid = 'v_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+        sessionStorage.setItem('visitor_id', vid);
+    }
+    document.cookie = 'vid=' + vid + '; max-age=' + (90*86400) + '; path=/; SameSite=Lax';
+    return vid;
+}
+
+function getDeviceInfo() {
+    const ua = navigator.userAgent;
+    const isMobile = /Mobi|Android|iPhone|iPad/i.test(ua);
+    let browser = 'Unknown';
+    if (ua.includes('Chrome') && !ua.includes('Edg')) browser = 'Chrome';
+    else if (ua.includes('Safari') && !ua.includes('Chrome')) browser = 'Safari';
+    else if (ua.includes('Firefox')) browser = 'Firefox';
+    else if (ua.includes('Edg')) browser = 'Edge';
+    return { device: isMobile ? 'Mobile' : 'Desktop', browser: browser, screen: screen.width + 'x' + screen.height };
+}
+
+// Core tracking function
+function trackEvent(eventName, extraData) {
+    if (isAdminMode) return;
+    const vid = getVisitorId();
+    const event = { event: eventName, time: new Date().toISOString(), ...(extraData || {}) };
+    VISITORS_COLLECTION.doc(vid).collection('events').add(event).catch(() => {});
+    const update = { lastUpdate: firebase.firestore.FieldValue.serverTimestamp() };
+    update['counters.' + eventName] = firebase.firestore.FieldValue.increment(1);
+    if (extraData && extraData.stars) update.lastStars = extraData.stars;
+    VISITORS_COLLECTION.doc(vid).set(update, { merge: true }).catch(() => {});
+}
+
+// Log page visit
+(function logPageVisit() {
+    if (isAdminMode) return;
+    const vid = getVisitorId();
+    const info = getDeviceInfo();
+    VISITORS_COLLECTION.doc(vid).set({
+        visitorId: vid,
+        firstVisit: firebase.firestore.FieldValue.serverTimestamp(),
+        device: info.device,
+        browser: info.browser,
+        screen: info.screen,
+        referrer: document.referrer || 'direct',
+        lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true }).catch(e => console.log('Visit log error:', e));
+    trackEvent('page_view');
+})();
+
+// === VISITOR DASHBOARD ===
+let dashboardOpen = false;
+
+function switchDashTab(tab) {
+    document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.dash-tab-content').forEach(c => c.classList.remove('active'));
+    if (tab === 'visitors') {
+        document.querySelector('.dash-tab:first-child').classList.add('active');
+        document.getElementById('tabVisitors').classList.add('active');
+    } else {
+        document.querySelector('.dash-tab:last-child').classList.add('active');
+        document.getElementById('tabLegend').classList.add('active');
     }
 }
 
-function resetContent() {
-    if (confirm('Bạn có chắc muốn khôi phục nội dung mặc định? Tất cả chỉnh sửa sẽ bị mất.')) {
-        localStorage.removeItem(STORAGE_KEY);
-        localStorage.removeItem(IMG_STORAGE_KEY);
-        localStorage.removeItem(GALLERY_STORAGE_KEY);
-        location.reload();
-    }
+function toggleVisitorDashboard() {
+    const panel = document.getElementById('visitorDashboard');
+    dashboardOpen = !dashboardOpen;
+    panel.classList.toggle('active', dashboardOpen);
+    if (dashboardOpen) loadVisitorDashboard();
 }
 
-function logoutAdmin() {
-    exitAdminMode();
-    sessionStorage.removeItem(SESSION_KEY);
-    showToast('Đã đăng xuất khỏi chế độ quản trị.', 'info');
+async function loadVisitorDashboard() {
+    const list = document.getElementById('visitorList');
+    const countEl = document.getElementById('visitorCount');
+    list.innerHTML = '<p class="text-center text-sm text-secondary py-8">Đang tải...</p>';
+
+    try {
+        const snap = await VISITORS_COLLECTION.orderBy('lastUpdate', 'desc').limit(100).get();
+        countEl.textContent = snap.size;
+
+        if (snap.empty) {
+            list.innerHTML = '<p class="text-center text-sm text-secondary py-8">Chưa có khách truy cập</p>';
+            return;
+        }
+
+        let html = '';
+        snap.forEach(doc => {
+            const d = doc.data();
+            const c = d.counters || {};
+            const vid = (d.visitorId || doc.id).slice(-8);
+            const device = d.device || '?';
+            const browser = d.browser || '?';
+            const scr = d.screen || '';
+            const time = d.lastUpdate ? d.lastUpdate.toDate().toLocaleString('vi-VN') : '';
+            const views = c.page_view || 0;
+            const popups = c.open_popup || 0;
+            const zalos = (c.click_zalo || 0) + (c.click_zalo_phone || 0);
+            const stars = d.lastStars || 0;
+            const starsStr = stars > 0 ? '★'.repeat(stars) + '☆'.repeat(5-stars) : '';
+            const isHot = zalos > 0;
+
+            html += '<div class="visitor-card' + (isHot ? ' visitor-card-new' : '') + '">'
+                + '<div class="flex justify-between items-start">'
+                + '<span class="visitor-name">#' + vid + '</span>'
+                + (starsStr ? '<span class="visitor-stars">' + starsStr + '</span>' : '')
+                + '</div>'
+                + '<div class="visitor-meta">'
+                + device + ' · ' + browser + (scr ? ' · ' + scr : '')
+                + '<br>👁 Xem: ' + views + 'x'
+                + (popups ? ' · 📋 Mở popup: ' + popups + 'x' : '')
+                + (zalos ? ' · 💬 Bấm Zalo: ' + zalos + 'x' : '')
+                + '<br>🕐 ' + time
+                + '</div></div>';
+        });
+
+        list.innerHTML = html;
+    } catch(e) {
+        console.error('Dashboard load error:', e);
+        list.innerHTML = '<p class="text-center text-sm text-error py-8">Lỗi tải dữ liệu</p>';
+    }
 }
 
 // === CTA POPUP ===
@@ -1469,207 +1748,110 @@ const starLabel = document.getElementById('starLabel');
 const starLabels = ['', 'Hơi quan tâm', 'Quan tâm', 'Khá quan tâm', 'Rất quan tâm', 'Cực kỳ quan tâm!'];
 let selectedStars = 0;
 
-// Open popup from all CTA buttons
 document.querySelectorAll('.cta-trigger').forEach(btn => {
-    btn.addEventListener('click', function(e) {
-        // Don't open popup in admin mode when editing text inside button
-        if (isAdminMode && e.target.hasAttribute('data-editable')) return;
-        e.preventDefault();
-        openCtaPopup();
-    });
+    btn.addEventListener('click', function(e) { if (isAdminMode && e.target.hasAttribute('data-editable')) return; e.preventDefault(); openCtaPopup(); });
 });
 
 function openCtaPopup() {
-    // Reset stars
     selectedStars = 0;
     starRating.querySelectorAll('.star-btn').forEach(b => b.classList.remove('active'));
     starLabel.textContent = 'Nhấp để đánh giá';
     ctaPopup.classList.add('active');
+    // Track: user opened CTA popup
+    trackEvent('open_popup');
 }
+function closeCtaPopup() { ctaPopup.classList.remove('active'); }
+ctaPopup.addEventListener('click', function(e) { if (e.target === ctaPopup) closeCtaPopup(); });
 
-function closeCtaPopup() {
-    ctaPopup.classList.remove('active');
-}
-
-// Close on overlay click
-ctaPopup.addEventListener('click', function(e) {
-    if (e.target === ctaPopup) closeCtaPopup();
-});
-
-// Star rating interaction
 starRating.querySelectorAll('.star-btn').forEach(btn => {
     btn.addEventListener('click', function() {
         selectedStars = parseInt(this.getAttribute('data-star'));
-        starRating.querySelectorAll('.star-btn').forEach((b, i) => {
-            b.classList.toggle('active', i < selectedStars);
-        });
+        starRating.querySelectorAll('.star-btn').forEach((b, i) => { b.classList.toggle('active', i < selectedStars); });
         starLabel.textContent = starLabels[selectedStars] || '';
+        trackEvent('rate_stars', { stars: selectedStars });
     });
+    btn.addEventListener('mouseenter', function() { const h = parseInt(this.getAttribute('data-star')); starRating.querySelectorAll('.star-btn').forEach((b, i) => { b.classList.toggle('active', i < h); }); });
+    btn.addEventListener('mouseleave', function() { starRating.querySelectorAll('.star-btn').forEach((b, i) => { b.classList.toggle('active', i < selectedStars); }); });
+});
 
-    // Hover preview
-    btn.addEventListener('mouseenter', function() {
-        const hoverStar = parseInt(this.getAttribute('data-star'));
-        starRating.querySelectorAll('.star-btn').forEach((b, i) => {
-            b.classList.toggle('active', i < hoverStar);
-        });
-    });
+// Track Zalo click
+document.getElementById('zaloLink').addEventListener('click', function() {
+    trackEvent('click_zalo');
+});
 
-    btn.addEventListener('mouseleave', function() {
-        starRating.querySelectorAll('.star-btn').forEach((b, i) => {
-            b.classList.toggle('active', i < selectedStars);
-        });
+// Track phone number Zalo links
+document.querySelectorAll('a[href*="zalo.me"]').forEach(link => {
+    if (link.id === 'zaloLink') return; // already handled
+    link.addEventListener('click', function() {
+        trackEvent('click_zalo_phone');
     });
 });
 
 // === GALLERY MANAGEMENT ===
-const GALLERY_STORAGE_KEY = 'admin_gallery_data';
-let galleryNextId = 3; // start after default 3 items
+let galleryNextId = 3;
 
 function initGalleryDots() {
-    const track = document.getElementById('galleryTrack');
-    const dotsContainer = document.getElementById('galleryDots');
+    const track = document.getElementById('galleryTrack'); const dotsContainer = document.getElementById('galleryDots');
     if (!track || !dotsContainer) return;
-
-    const items = track.querySelectorAll('.gallery-item');
-    dotsContainer.innerHTML = '';
-    items.forEach((_, i) => {
-        const dot = document.createElement('div');
-        dot.className = 'gallery-dot' + (i === 0 ? ' active' : '');
-        dotsContainer.appendChild(dot);
-    });
-
-    track.addEventListener('scroll', () => {
-        const scrollLeft = track.scrollLeft;
-        const itemWidth = 296; // 280 + 16 gap
-        const activeIdx = Math.round(scrollLeft / itemWidth);
-        dotsContainer.querySelectorAll('.gallery-dot').forEach((dot, i) => {
-            dot.classList.toggle('active', i === activeIdx);
-        });
-    });
+    const items = track.querySelectorAll('.gallery-item'); dotsContainer.innerHTML = '';
+    items.forEach((_, i) => { const dot = document.createElement('div'); dot.className = 'gallery-dot' + (i === 0 ? ' active' : ''); dotsContainer.appendChild(dot); });
+    track.addEventListener('scroll', () => { const idx = Math.round(track.scrollLeft / 296); dotsContainer.querySelectorAll('.gallery-dot').forEach((dot, i) => { dot.classList.toggle('active', i === idx); }); });
 }
 
 function addGalleryItem() {
-    const track = document.getElementById('galleryTrack');
-    const addBtn = document.getElementById('galleryAddBtn');
+    const track = document.getElementById('galleryTrack'); const addBtn = document.getElementById('galleryAddBtn');
     const idx = galleryNextId++;
-
-    const item = document.createElement('div');
-    item.className = 'gallery-item';
-    item.setAttribute('data-gallery-idx', idx);
-    item.style.position = 'relative';
-    item.innerHTML = `
-        <button class="gallery-delete-btn" onclick="deleteGalleryItem(${idx})"><span class="material-symbols-outlined">close</span></button>
-        <img class="gallery-item-img" data-img="gallery-${idx}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='180' fill='%23e7e8e9'%3E%3Crect width='280' height='180'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23999' font-family='sans-serif' font-size='14'%3ENhấp để thêm ảnh%3C/text%3E%3C/svg%3E" alt="Dashboard học viên"/>
-        <div class="gallery-item-body">
-            <h4 class="font-headline font-bold text-sm text-on-surface" data-editable="gallery-${idx}-name" contenteditable="true" spellcheck="false">Tên học viên</h4>
-            <p class="text-[11px] text-secondary mt-0.5" data-editable="gallery-${idx}-desc" contenteditable="true" spellcheck="false">Mô tả dashboard</p>
-        </div>
-    `;
-
+    const item = document.createElement('div'); item.className = 'gallery-item'; item.setAttribute('data-gallery-idx', idx); item.style.position = 'relative';
+    item.innerHTML = '<button class="gallery-delete-btn" onclick="deleteGalleryItem('+idx+')"><span class="material-symbols-outlined">close</span></button><img class="gallery-item-img" data-img="gallery-'+idx+'" src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'280\' height=\'180\' fill=\'%23e7e8e9\'%3E%3Crect width=\'280\' height=\'180\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23999\' font-family=\'sans-serif\' font-size=\'14\'%3ENhấp để thêm ảnh%3C/text%3E%3C/svg%3E" alt="Dashboard"/><div class="gallery-item-body"><h4 class="font-headline font-bold text-sm text-on-surface" data-editable="gallery-'+idx+'-name" contenteditable="true" spellcheck="false">Tên học viên</h4><p class="text-[11px] text-secondary mt-0.5" data-editable="gallery-'+idx+'-desc" contenteditable="true" spellcheck="false">Mô tả dashboard</p></div>';
     track.insertBefore(item, addBtn);
-
-    // Setup image click for new item
     const newImg = item.querySelector('[data-img]');
-    if (newImg) {
-        newImg.style.cursor = 'pointer';
-        newImg.onclick = function(e) {
-            if (!isAdminMode) return;
-            e.preventDefault();
-            e.stopPropagation();
-            openImageEditModal(newImg);
-        };
-    }
-
-    // Make new editable fields active
-    item.querySelectorAll('[data-editable]').forEach(el => {
-        el.classList.add('admin-editable');
-    });
-
-    initGalleryDots();
-    showToast('Đã thêm ảnh mới! Nhấp vào ảnh để thay thế.', 'success');
-
-    // Scroll to new item
-    setTimeout(() => {
-        item.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-    }, 100);
+    if (newImg) { newImg.style.cursor = 'pointer'; newImg.onclick = function(e) { if (!isAdminMode) return; e.preventDefault(); e.stopPropagation(); openImageEditModal(newImg); }; }
+    item.querySelectorAll('[data-editable]').forEach(el => { el.classList.add('admin-editable'); });
+    initGalleryDots(); showToast('Đã thêm! Nhấp vào ảnh để thay thế.', 'success');
+    setTimeout(() => { item.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }); }, 100);
 }
 
 function deleteGalleryItem(idx) {
     if (!confirm('Xóa ảnh kết quả này?')) return;
-    const item = document.querySelector(`[data-gallery-idx="${idx}"]`);
-    if (item) {
-        item.remove();
-        initGalleryDots();
-        showToast('Đã xóa.', 'info');
-    }
+    const item = document.querySelector('[data-gallery-idx="'+idx+'"]');
+    if (item) { item.remove(); initGalleryDots(); showToast('Đã xóa.', 'info'); }
 }
 
-function saveGalleryData() {
-    const items = document.querySelectorAll('.gallery-item');
-    const data = [];
+async function saveGalleryToFirestore() {
+    const items = document.querySelectorAll('.gallery-item'); const data = [];
     items.forEach(item => {
         const idx = item.getAttribute('data-gallery-idx');
-        const img = item.querySelector('[data-img]');
-        const name = item.querySelector(`[data-editable="gallery-${idx}-name"]`);
-        const desc = item.querySelector(`[data-editable="gallery-${idx}-desc"]`);
-        data.push({
-            idx: idx,
-            imgSrc: img ? img.src : '',
-            name: name ? name.innerHTML : '',
-            desc: desc ? desc.innerHTML : ''
-        });
+        const img = item.querySelector('[data-img]'); const name = item.querySelector('[data-editable="gallery-'+idx+'-name"]'); const desc = item.querySelector('[data-editable="gallery-'+idx+'-desc"]');
+        const imgSrc = img ? img.src : '';
+        if (imgSrc.length > 900000) { showToast('Ảnh gallery quá lớn, dùng link URL thay thế.', 'error'); return; }
+        data.push({ idx: idx, imgSrc: imgSrc, name: name ? name.innerHTML : '', desc: desc ? desc.innerHTML : '' });
     });
-    localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify(data));
+    await GALLERY_DOC.set({ items: data });
 }
 
-function loadGalleryData() {
-    const saved = localStorage.getItem(GALLERY_STORAGE_KEY);
-    if (!saved) { initGalleryDots(); return; }
+async function loadGalleryFromFirestore() {
     try {
-        const data = JSON.parse(saved);
-        const track = document.getElementById('galleryTrack');
-        const addBtn = document.getElementById('galleryAddBtn');
-
-        // Remove existing items
+        const snap = await GALLERY_DOC.get();
+        if (!snap.exists) { initGalleryDots(); return; }
+        const data = snap.data().items || [];
+        const track = document.getElementById('galleryTrack'); const addBtn = document.getElementById('galleryAddBtn');
         track.querySelectorAll('.gallery-item').forEach(el => el.remove());
-
-        // Recreate from saved data
         data.forEach(item => {
-            const idx = parseInt(item.idx);
-            if (idx >= galleryNextId) galleryNextId = idx + 1;
-
-            const el = document.createElement('div');
-            el.className = 'gallery-item';
-            el.setAttribute('data-gallery-idx', idx);
-            el.style.position = 'relative';
-            el.innerHTML = `
-                <button class="gallery-delete-btn" onclick="deleteGalleryItem(${idx})"><span class="material-symbols-outlined">close</span></button>
-                <img class="gallery-item-img" data-img="gallery-${idx}" src="${item.imgSrc}" alt="Dashboard học viên"/>
-                <div class="gallery-item-body">
-                    <h4 class="font-headline font-bold text-sm text-on-surface" data-editable="gallery-${idx}-name">${item.name}</h4>
-                    <p class="text-[11px] text-secondary mt-0.5" data-editable="gallery-${idx}-desc">${item.desc}</p>
-                </div>
-            `;
+            const idx = parseInt(item.idx); if (idx >= galleryNextId) galleryNextId = idx + 1;
+            const el = document.createElement('div'); el.className = 'gallery-item'; el.setAttribute('data-gallery-idx', idx); el.style.position = 'relative';
+            el.innerHTML = '<button class="gallery-delete-btn" onclick="deleteGalleryItem('+idx+')"><span class="material-symbols-outlined">close</span></button><img class="gallery-item-img" data-img="gallery-'+idx+'" src="'+item.imgSrc+'" alt="Dashboard"/><div class="gallery-item-body"><h4 class="font-headline font-bold text-sm text-on-surface" data-editable="gallery-'+idx+'-name">'+item.name+'</h4><p class="text-[11px] text-secondary mt-0.5" data-editable="gallery-'+idx+'-desc">'+item.desc+'</p></div>';
             track.insertBefore(el, addBtn);
         });
-
         initGalleryDots();
-    } catch(e) { console.error('Error loading gallery:', e); initGalleryDots(); }
+    } catch(e) { console.error('Gallery load error:', e); initGalleryDots(); }
 }
 
-// === TOAST NOTIFICATION ===
-function showToast(message, type = 'info') {
-    toastEl.textContent = message;
-    toastEl.className = `toast ${type} show`;
-    setTimeout(() => { toastEl.classList.remove('show'); }, 3000);
-}
+// === TOAST ===
+function showToast(message, type = 'info') { toastEl.textContent = message; toastEl.className = 'toast ' + type + ' show'; setTimeout(() => { toastEl.classList.remove('show'); }, 3000); }
 
 // === INITIALIZATION ===
-loadContent();
-loadGalleryData();
-if (sessionStorage.getItem(SESSION_KEY) === 'true') {
-    enterAdminMode();
-}
+loadContentForVisitors();
+initGalleryDots();
 </script>
 
 </body></html>
