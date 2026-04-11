@@ -246,6 +246,44 @@
         .visitor-card .visitor-meta { color: #6f7a70; font-size: 11px; margin-top: 4px; line-height: 1.6; }
         .visitor-card .visitor-stars { color: #f59e0b; font-size: 12px; letter-spacing: 1px; }
         .visitor-card-new { border-left: 3px solid #217346; }
+        /* Analytics Dashboard overlay */
+        .analytics-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);
+            z-index: 9996; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+        .analytics-overlay.active { opacity: 1; pointer-events: all; }
+        .analytics-box {
+            background: white; border-radius: 1.5rem; width: 100%; max-width: 520px;
+            max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            transform: translateY(20px); transition: transform 0.3s;
+        }
+        .analytics-overlay.active .analytics-box { transform: translateY(0); }
+        .analytics-header {
+            position: sticky; top: 0; background: white; padding: 20px 24px 12px; z-index: 2;
+            border-bottom: 1px solid #e1e3e4; display: flex; justify-content: space-between; align-items: center;
+            border-radius: 1.5rem 1.5rem 0 0;
+        }
+        .analytics-body { padding: 16px 20px 24px; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+        .stat-card {
+            padding: 16px; border-radius: 14px; border: 1px solid #e1e3e4; background: #f8f9fa;
+            text-align: center;
+        }
+        .stat-value { font-family: 'Manrope'; font-weight: 800; font-size: 28px; color: #191c1d; line-height: 1; }
+        .stat-label { font-size: 11px; color: #6f7a70; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 6px; }
+        .stat-card-highlight { background: #f0fdf4; border-color: #86efac; }
+        .stat-card-highlight .stat-value { color: #217346; }
+        .stat-card-warn { background: #fef3c7; border-color: #fcd34d; }
+        .stat-card-warn .stat-value { color: #d97706; }
+        .stat-card-hot { background: #dbeafe; border-color: #93c5fd; }
+        .stat-card-hot .stat-value { color: #0068ff; }
+        .funnel-bar-bg { height: 28px; background: #e7e8e9; border-radius: 8px; overflow: hidden; position: relative; margin-bottom: 6px; }
+        .funnel-bar-fill { height: 100%; border-radius: 8px; transition: width 0.6s ease; display: flex; align-items: center; padding-left: 10px; font-size: 11px; font-weight: 700; color: white; min-width: 32px; }
+        .funnel-label { display: flex; justify-content: space-between; font-size: 11px; color: #6f7a70; margin-bottom: 12px; }
+        .device-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f0f1f2; font-size: 13px; }
+        .device-row:last-child { border-bottom: none; }
+        .device-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: #f3f4f5; font-size: 14px; }
         /* Dashboard tabs */
         .dash-tabs { display: flex; border-bottom: 1px solid #e1e3e4; flex-shrink: 0; }
         .dash-tab {
@@ -667,6 +705,9 @@
     <div class="flex items-center gap-2">
         <button class="btn-save" id="btnSave" onclick="saveContent()">
             <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">save</span> Lưu</span>
+        </button>
+        <button class="btn-visitors" onclick="toggleAnalyticsDashboard()">
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">monitoring</span> Dashboard</span>
         </button>
         <button class="btn-visitors" id="btnVisitors" onclick="toggleVisitorDashboard()">
             <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">group</span> Khách (<span id="visitorCount">0</span>)</span>
@@ -1220,6 +1261,71 @@
     </div>
 </div>
 
+<!-- Analytics Dashboard -->
+<div class="analytics-overlay" id="analyticsDashboard">
+    <div class="analytics-box">
+        <div class="analytics-header">
+            <div>
+                <h3 class="font-headline font-extrabold text-lg text-on-surface">Dashboard tổng quan</h3>
+                <p class="text-[11px] text-secondary mt-0.5">Chỉ số truy cập & chuyển đổi</p>
+            </div>
+            <button onclick="toggleAnalyticsDashboard()" class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center hover:bg-surface-container-high transition-colors">
+                <span class="material-symbols-outlined text-lg text-secondary">close</span>
+            </button>
+        </div>
+        <div class="analytics-body">
+            <!-- Stats grid -->
+            <div class="stat-grid" id="statsGrid">
+                <div class="stat-card stat-card-highlight">
+                    <div class="stat-value" id="statTotalVisitors">—</div>
+                    <div class="stat-label">Tổng khách</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statTotalViews">—</div>
+                    <div class="stat-label">Lượt xem</div>
+                </div>
+                <div class="stat-card stat-card-warn">
+                    <div class="stat-value" id="statPopupOpens">—</div>
+                    <div class="stat-label">Mở popup</div>
+                </div>
+                <div class="stat-card stat-card-hot">
+                    <div class="stat-value" id="statZaloClicks">—</div>
+                    <div class="stat-label">Bấm Zalo</div>
+                </div>
+            </div>
+
+            <!-- Conversion funnel -->
+            <h4 class="font-headline font-bold text-sm text-on-surface mb-3">Phễu chuyển đổi</h4>
+            <div style="margin-bottom:20px;">
+                <div class="funnel-label"><span>Xem trang</span><span id="funnelViewPct">100%</span></div>
+                <div class="funnel-bar-bg"><div class="funnel-bar-fill" id="funnelViewBar" style="width:100%;background:#217346;">100%</div></div>
+
+                <div class="funnel-label"><span>Mở popup đăng ký</span><span id="funnelPopupPct">—</span></div>
+                <div class="funnel-bar-bg"><div class="funnel-bar-fill" id="funnelPopupBar" style="width:0%;background:#d97706;"></div></div>
+
+                <div class="funnel-label"><span>Đánh giá sao</span><span id="funnelStarPct">—</span></div>
+                <div class="funnel-bar-bg"><div class="funnel-bar-fill" id="funnelStarBar" style="width:0%;background:#f59e0b;"></div></div>
+
+                <div class="funnel-label"><span>Bấm Zalo (chuyển đổi)</span><span id="funnelZaloPct">—</span></div>
+                <div class="funnel-bar-bg"><div class="funnel-bar-fill" id="funnelZaloBar" style="width:0%;background:#0068ff;"></div></div>
+            </div>
+
+            <!-- Star distribution -->
+            <h4 class="font-headline font-bold text-sm text-on-surface mb-3">Phân bố đánh giá sao</h4>
+            <div id="starDistribution" style="margin-bottom:20px;"></div>
+
+            <!-- Device breakdown -->
+            <h4 class="font-headline font-bold text-sm text-on-surface mb-3">Thiết bị truy cập</h4>
+            <div id="deviceBreakdown"></div>
+
+            <!-- Refresh -->
+            <button onclick="loadAnalyticsDashboard()" style="width:100%;margin-top:16px;padding:10px;border-radius:12px;background:#f3f4f5;border:1px solid #e1e3e4;font-size:12px;font-weight:600;color:#6f7a70;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+                <span class="material-symbols-outlined" style="font-size:16px;">refresh</span> Làm mới dữ liệu
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- CTA Popup -->
 <div class="cta-popup-overlay" id="ctaPopup">
     <div class="cta-popup-box">
@@ -1667,6 +1773,118 @@ function trackEvent(eventName, extraData) {
     }, { merge: true }).catch(e => console.log('Visit log error:', e));
     trackEvent('page_view');
 })();
+
+// === ANALYTICS DASHBOARD ===
+let analyticsOpen = false;
+
+function toggleAnalyticsDashboard() {
+    analyticsOpen = !analyticsOpen;
+    document.getElementById('analyticsDashboard').classList.toggle('active', analyticsOpen);
+    if (analyticsOpen) loadAnalyticsDashboard();
+}
+
+document.getElementById('analyticsDashboard').addEventListener('click', function(e) {
+    if (e.target === this) toggleAnalyticsDashboard();
+});
+
+async function loadAnalyticsDashboard() {
+    try {
+        const snap = await VISITORS_COLLECTION.orderBy('lastUpdate', 'desc').limit(500).get();
+        const totalVisitors = snap.size;
+        let totalViews = 0, totalPopups = 0, totalZalos = 0, totalStarRates = 0;
+        let starCounts = {1:0, 2:0, 3:0, 4:0, 5:0};
+        let devices = {};
+        let browsers = {};
+        let visitorsWithPopup = 0, visitorsWithZalo = 0, visitorsWithStars = 0;
+
+        snap.forEach(doc => {
+            const d = doc.data();
+            const c = d.counters || {};
+            totalViews += c.page_view || 0;
+            totalPopups += c.open_popup || 0;
+            const zc = (c.click_zalo || 0) + (c.click_zalo_phone || 0);
+            totalZalos += zc;
+            totalStarRates += c.rate_stars || 0;
+
+            if (c.open_popup) visitorsWithPopup++;
+            if (zc > 0) visitorsWithZalo++;
+            if (d.lastStars) {
+                visitorsWithStars++;
+                const s = Math.min(5, Math.max(1, d.lastStars));
+                starCounts[s] = (starCounts[s] || 0) + 1;
+            }
+
+            const dev = d.device || 'Unknown';
+            devices[dev] = (devices[dev] || 0) + 1;
+            const br = d.browser || 'Unknown';
+            browsers[br] = (browsers[br] || 0) + 1;
+        });
+
+        // Update stat cards
+        document.getElementById('statTotalVisitors').textContent = totalVisitors;
+        document.getElementById('statTotalViews').textContent = totalViews;
+        document.getElementById('statPopupOpens').textContent = totalPopups;
+        document.getElementById('statZaloClicks').textContent = totalZalos;
+
+        // Funnel
+        const pctPopup = totalVisitors > 0 ? Math.round(visitorsWithPopup / totalVisitors * 100) : 0;
+        const pctStar = totalVisitors > 0 ? Math.round(visitorsWithStars / totalVisitors * 100) : 0;
+        const pctZalo = totalVisitors > 0 ? Math.round(visitorsWithZalo / totalVisitors * 100) : 0;
+
+        document.getElementById('funnelPopupPct').textContent = pctPopup + '%';
+        document.getElementById('funnelPopupBar').style.width = Math.max(pctPopup, 2) + '%';
+        document.getElementById('funnelPopupBar').textContent = pctPopup + '%';
+
+        document.getElementById('funnelStarPct').textContent = pctStar + '%';
+        document.getElementById('funnelStarBar').style.width = Math.max(pctStar, 2) + '%';
+        document.getElementById('funnelStarBar').textContent = pctStar + '%';
+
+        document.getElementById('funnelZaloPct').textContent = pctZalo + '%';
+        document.getElementById('funnelZaloBar').style.width = Math.max(pctZalo, 2) + '%';
+        document.getElementById('funnelZaloBar').textContent = pctZalo + '%';
+
+        // Star distribution
+        const maxStar = Math.max(...Object.values(starCounts), 1);
+        let starHtml = '';
+        for (let i = 5; i >= 1; i--) {
+            const cnt = starCounts[i] || 0;
+            const w = Math.round(cnt / maxStar * 100);
+            starHtml += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'
+                + '<span style="font-size:12px;width:40px;text-align:right;color:#f59e0b;">' + '★'.repeat(i) + '</span>'
+                + '<div style="flex:1;height:18px;background:#f0f1f2;border-radius:6px;overflow:hidden;">'
+                + '<div style="height:100%;width:' + Math.max(w,2) + '%;background:#f59e0b;border-radius:6px;transition:width 0.5s;"></div></div>'
+                + '<span style="font-size:12px;font-weight:600;color:#191c1d;width:24px;">' + cnt + '</span>'
+                + '</div>';
+        }
+        document.getElementById('starDistribution').innerHTML = starHtml;
+
+        // Device & browser breakdown
+        let devHtml = '';
+        const devIcons = { Mobile: '📱', Desktop: '💻', Unknown: '❓' };
+        Object.keys(devices).sort((a,b) => devices[b] - devices[a]).forEach(dev => {
+            const pct = Math.round(devices[dev] / totalVisitors * 100);
+            devHtml += '<div class="device-row">'
+                + '<div class="device-icon">' + (devIcons[dev] || '❓') + '</div>'
+                + '<span style="flex:1;font-weight:600;color:#191c1d;">' + dev + '</span>'
+                + '<span style="color:#6f7a70;font-weight:600;">' + devices[dev] + ' (' + pct + '%)</span>'
+                + '</div>';
+        });
+        Object.keys(browsers).sort((a,b) => browsers[b] - browsers[a]).forEach(br => {
+            const pct = Math.round(browsers[br] / totalVisitors * 100);
+            const brIcons = { Chrome: '🌐', Safari: '🧭', Firefox: '🦊', Edge: '🔵', Unknown: '❓' };
+            devHtml += '<div class="device-row">'
+                + '<div class="device-icon">' + (brIcons[br] || '🌐') + '</div>'
+                + '<span style="flex:1;font-weight:600;color:#191c1d;">' + br + '</span>'
+                + '<span style="color:#6f7a70;font-weight:600;">' + browsers[br] + ' (' + pct + '%)</span>'
+                + '</div>';
+        });
+        document.getElementById('deviceBreakdown').innerHTML = devHtml;
+
+    } catch(e) {
+        console.error('Analytics load error:', e);
+        showToast('Lỗi tải analytics: ' + e.message, 'error');
+    }
+}
 
 // === VISITOR DASHBOARD ===
 let dashboardOpen = false;
