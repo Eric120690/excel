@@ -1774,6 +1774,36 @@ function trackEvent(eventName, extraData) {
     trackEvent('page_view');
 })();
 
+// === SCROLL TRACKING ===
+(function initScrollTracking() {
+    let lastScrollFire = 0;
+    let maxScrollDepth = 0;
+
+    function getScrollDepth() {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        return docHeight > 0 ? Math.round((scrollTop / docHeight) * 100) : 0;
+    }
+
+    window.addEventListener('scroll', function() {
+        if (isAdminMode) return;
+        const depth = getScrollDepth();
+        if (depth > maxScrollDepth) maxScrollDepth = depth;
+
+        const now = Date.now();
+        if (now - lastScrollFire < 500) return; // throttle 500ms
+        lastScrollFire = now;
+
+        const vid = getVisitorId();
+        trackEvent('scroll');
+        VISITORS_COLLECTION.doc(vid).set({
+            maxScrollDepth: maxScrollDepth,
+            lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true }).catch(function() {});
+    }, { passive: true });
+})();
+
+
 // === ANALYTICS DASHBOARD ===
 let analyticsOpen = false;
 
