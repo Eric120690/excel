@@ -1776,8 +1776,8 @@ function trackEvent(eventName, extraData) {
 
 // === SCROLL TRACKING ===
 (function initScrollTracking() {
-    let lastScrollFire = 0;
     let maxScrollDepth = 0;
+    let isScrolling = false;
 
     function getScrollDepth() {
         const scrollTop = window.scrollY || document.documentElement.scrollTop;
@@ -1785,22 +1785,37 @@ function trackEvent(eventName, extraData) {
         return docHeight > 0 ? Math.round((scrollTop / docHeight) * 100) : 0;
     }
 
-    window.addEventListener('scroll', function() {
+    function onScrollEnd() {
+        if (!isScrolling) return;
+        isScrolling = false;
         if (isAdminMode) return;
-        const depth = getScrollDepth();
-        if (depth > maxScrollDepth) maxScrollDepth = depth;
-
-        const now = Date.now();
-        if (now - lastScrollFire < 500) return; // throttle 500ms
-        lastScrollFire = now;
-
         const vid = getVisitorId();
         trackEvent('scroll');
         VISITORS_COLLECTION.doc(vid).set({
             maxScrollDepth: maxScrollDepth,
             lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true }).catch(function() {});
+    }
+
+    // Cập nhật maxScrollDepth liên tục trong khi cuộn
+    window.addEventListener('scroll', function() {
+        if (isAdminMode) return;
+        isScrolling = true;
+        const depth = getScrollDepth();
+        if (depth > maxScrollDepth) maxScrollDepth = depth;
     }, { passive: true });
+
+    // scrollend: browser tự biết khi nào dừng hẳn (Chrome 114+, Firefox 109+)
+    // fallback debounce cho Safari và browser cũ
+    if ('onscrollend' in window) {
+        window.addEventListener('scrollend', onScrollEnd, { passive: true });
+    } else {
+        let fallback = null;
+        window.addEventListener('scroll', function() {
+            clearTimeout(fallback);
+            fallback = setTimeout(onScrollEnd, 150);
+        }, { passive: true });
+    }
 })();
 
 
